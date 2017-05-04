@@ -48,5 +48,5 @@ public class Dictionary implements Serializable {
   public double jointProbability(List<String> term){
     return 0.0;
   }
-  
+
 }

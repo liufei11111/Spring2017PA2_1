@@ -33,7 +33,8 @@ public class CandidateGenerator implements Serializable {
       '8', '9', ' ', ',' };
 
   // Generate all candidates for the target query
-  public Set<String> getCandidates(String query) throws Exception {
+  public Set<String> getCandidates(String query, LanguageModel languageModel,
+      NoisyChannelModel nsm) throws Exception {
     Set<String> candidates = new HashSet<String>();
     /*
      * Your code here

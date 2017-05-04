@@ -73,7 +73,7 @@ public class RunCorrector {
     while ((query = queriesFileReader.readLine()) != null) {
 
       String correctedQuery = query;
-      Set<String> candidateQuery = CandidateGenerator.get().getCandidates(query);
+      Set<String> candidateQuery = CandidateGenerator.get().getCandidates(query,languageModel,nsm);
       correctedQuery = languageModel.pickTopCandidate(candidateQuery,nsm);
       /*
        * Your code here: currently the correctQuery and original query are the same

@@ -80,8 +80,8 @@ public class LanguageModel implements Serializable {
          * Remember: each line is a document (refer to PA2 handout)
          *
          */
-        line.replaceAll("_"," ");
-        line.replaceAll("\\s+","\\s ");
+        line.replaceAll("_+"," ");
+        line.replaceAll("\\s+","\\s");
         String[] tokens = line.trim().split(" ");
         for (int i=0;i<tokens.length;++i){
           boolean foundNum = containsNumber(tokens[i],allChar);

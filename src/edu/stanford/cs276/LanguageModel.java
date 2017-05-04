@@ -65,6 +65,15 @@ public class LanguageModel implements Serializable {
 
     System.out.println("Constructing dictionaries...");
     File dir = new File(corpusFilePath);
+//    FileWriter fw = new FileWriter(new File("unigram.txt"));
+//    FileWriter fw1 = new FileWriter(new File("nonExistenceChars.txt"));
+//    FileWriter fw2 = new FileWriter(new File("completeChars.txt"));
+//    FileWriter fw3 = new FileWriter(new File("orderbylength.txt"));
+//    FileWriter fw4 = new FileWriter(new File("orderbylengthgold.txt"));
+//    FileWriter fw5 = new FileWriter(new File("wordsNotCoveredInGold.txt"));
+
+
+
     for (File file : dir.listFiles()) {
       if (".".equals(file.getName()) || "..".equals(file.getName())) {
         continue; // Ignore the self and parent aliases.
@@ -72,7 +81,7 @@ public class LanguageModel implements Serializable {
       System.out.printf("Reading data file %s ...\n", file.getName());
       BufferedReader input = new BufferedReader(new FileReader(file));
 
-      Set<Character> allChar = new HashSet<>();
+//      Set<Character> allChar = new HashSet<>();
 
       String line = null;
       while ((line = input.readLine()) != null) {
@@ -84,9 +93,9 @@ public class LanguageModel implements Serializable {
         line = line.replaceAll("\\s+"," ");
         String[] tokens = line.trim().split(" ");
         for (int i=0;i<tokens.length;++i){
-          boolean foundNum = containsNumberOrTooLong(tokens[i],allChar);
+          boolean foundNum = containsNumberOrTooLong(tokens[i]);
           if (foundNum){continue;}
-          if (i!=tokens.length-1&&containsNumberOrTooLong(tokens[i+1],allChar)){
+          if (i!=tokens.length-1&&!containsNumberOrTooLong(tokens[i+1])){
             Pair<String,String> bigramPair = new Pair<>(tokens[i],tokens[i+1]);
             if (dictionary.bigram.containsKey(bigramPair)){
               dictionary.bigram.put(bigramPair,dictionary.bigram.get(bigramPair)+1);
@@ -104,74 +113,73 @@ public class LanguageModel implements Serializable {
         }
 
       }
-      FileWriter fw = new FileWriter(new File("unigram.txt"));
-      FileWriter fw1 = new FileWriter(new File("nonExistenceChars.txt"));
-      FileWriter fw2 = new FileWriter(new File("completeChars.txt"));
-      FileWriter fw3 = new FileWriter(new File("orderbylength.txt"));
-      FileWriter fw4 = new FileWriter(new File("orderbylengthgold.txt"));
-      List<Entry<String,Integer>> list = new ArrayList<>(dictionary.unigram.entrySet());
-      Collections.sort(list, new Comparator<Entry<String, Integer>>() {
-        @Override
-        public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
-          return o2.getValue().compareTo(o1.getValue());
-        }
-      });
-      for (int i=0;i<list.size();++i){
-        fw.write(list.get(i).getKey()+","+list.get(i).getValue()+"\n");
-      }
-      fw.close();
-      Collections.sort(list, new Comparator<Entry<String, Integer>>() {
-        @Override
-        public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
-          return o2.getKey().length()-(o1.getKey().length());
-        }
-      });
-      for (int i=0;i<list.size();++i){
-        fw3.write(list.get(i).getKey()+","+list.get(i).getValue()+"\n");
-      }
-      fw3.close();
-      Set<Character> goldCharSet = new HashSet<>();
-      BufferedReader gold = new BufferedReader(new FileReader("data/dev_set/gold.txt"));
-      HashMap<String, Integer> goldDic = new HashMap<>();
-      while ((line = input.readLine())!= null){
-        for (String str : line.split(" ")){
-          if (goldDic.containsKey(str)){
-            goldDic.put(str,goldDic.get(str)+1);
-          }else{
-            goldDic.put(str,1);
-          }
-        }
-        for (char aChar : line.toCharArray()){
-          goldCharSet.add(aChar);
-        }
-      }
-      list = new ArrayList<>(goldDic.entrySet());
-      Collections.sort(list, new Comparator<Entry<String, Integer>>() {
-        @Override
-        public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
-          return o2.getValue().compareTo(o1.getValue());
-        }
-      });
-      for (Entry<String,Integer> entry:list){
-        fw4.write(entry.getKey()+","+entry.getValue()+"\n");
-      }
-      for(Character oneChar : allChar){
-        fw2.write(oneChar+"\n");
-      }
-      allChar.removeAll(goldCharSet);
-      for (Character ch : allChar){
-        fw1.write(ch+"\n");
-      }
-      fw1.close();
-      fw2.close();
-      fw3.close();
-        gold.close();
-      input.close();
+
+
     }
+//    List<Entry<String,Integer>> list = new ArrayList<>(dictionary.unigram.entrySet());
+//    Collections.sort(list, new Comparator<Entry<String, Integer>>() {
+//      @Override
+//      public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
+//        return o2.getValue().compareTo(o1.getValue());
+//      }
+//    });
+//    for (int i=0;i<list.size();++i){
+//      fw.write(list.get(i).getKey()+","+list.get(i).getValue()+"\n");
+//    }
+//    fw.close();
+//    Collections.sort(list, new Comparator<Entry<String, Integer>>() {
+//      @Override
+//      public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
+//        return o2.getKey().length()-(o1.getKey().length());
+//      }
+//    });
+//    for (int i=0;i<list.size();++i){
+//      fw3.write(list.get(i).getKey()+","+list.get(i).getValue()+"\n");
+//    }
+//    fw3.close();
+//    Set<Character> goldCharSet = new HashSet<>();
+//    BufferedReader gold = new BufferedReader(new FileReader("data/dev_set/gold.txt"));
+//    HashMap<String, Integer> goldDic = new HashMap<>();
+//    String line = null;
+//    while ((line = gold.readLine())!= null){
+//      for (String str : line.split(" ")){
+//        if (goldDic.containsKey(str)){
+//          goldDic.put(str,goldDic.get(str)+1);
+//        }else{
+//          goldDic.put(str,1);
+//        }
+//      }
+//      for (char aChar : line.toCharArray()){
+//        goldCharSet.add(aChar);
+//      }
+//    }
+//    list = new ArrayList<>(goldDic.entrySet());
+//    Collections.sort(list, new Comparator<Entry<String, Integer>>() {
+//      @Override
+//      public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
+//        return o2.getValue().compareTo(o1.getValue());
+//      }
+//    });
+//    for (Entry<String,Integer> entry:list){
+//      fw4.write(entry.getKey()+","+entry.getValue()+"\n");
+//    }
+//    Set<String> setNotInGoldInDIc = goldDic.keySet();
+//    setNotInGoldInDIc.removeAll(dictionary.unigram.keySet());
+//    for (String str : setNotInGoldInDIc){
+//      fw5.write(str+"\n");
+//    }
+//
+//    fw1.close();
+//    fw2.close();
+//    fw3.close();
+//    gold.close();
+//    fw4.close();
+//    fw5.close();
+
     System.out.println("Done.");
   }
 
-  private boolean containsNumberOrTooLong(String str, Set<Character> allChar) {
+  private boolean containsNumberOrTooLong(String str) {
     if (str.length()>25){return true;}
     boolean foundNum = false;
     for (char aChar : str.toCharArray()){
@@ -179,8 +187,6 @@ public class LanguageModel implements Serializable {
         foundNum=true;
         break;
       }
-      // TODO remove test
-      allChar.add(aChar);
     }
     return foundNum;
   }

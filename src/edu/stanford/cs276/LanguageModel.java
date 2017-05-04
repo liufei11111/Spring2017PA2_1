@@ -10,6 +10,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import edu.stanford.cs276.util.Dictionary;
+import java.util.Set;
 
 /**
  * LanguageModel class constructs a language model from the training corpus.
@@ -108,5 +109,9 @@ public class LanguageModel implements Serializable {
     ObjectOutputStream save = new ObjectOutputStream(saveFile);
     save.writeObject(this);
     save.close();
+  }
+
+  public String pickTopCandidate(Set<String> candidateQuery, NoisyChannelModel nsm) {
+    return null;
   }
 }

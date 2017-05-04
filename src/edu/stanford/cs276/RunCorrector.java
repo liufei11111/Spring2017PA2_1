@@ -1,6 +1,5 @@
 package edu.stanford.cs276;
 
-import edu.stanford.cs276.util.Dictionary;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -11,7 +10,7 @@ public class RunCorrector {
 
   public static LanguageModel languageModel;
   public static NoisyChannelModel nsm;
-  public static Dictionary dictionary;
+
   public static void main(String[] args) throws Exception {
     
     // Parse input arguments
@@ -75,7 +74,7 @@ public class RunCorrector {
 
       String correctedQuery = query;
       Set<String> candidateQuery = CandidateGenerator.get().getCandidates(query);
-      correctedQuery = dictionary.pickTopCandidate(candidateQuery,languageModel,nsm);
+      correctedQuery = languageModel.pickTopCandidate(candidateQuery,nsm);
       /*
        * Your code here: currently the correctQuery and original query are the same
        * Complete this implementation so that the spell corrector corrects the 

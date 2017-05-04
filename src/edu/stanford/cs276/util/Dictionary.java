@@ -48,9 +48,5 @@ public class Dictionary implements Serializable {
   public double jointProbability(List<String> term){
     return 0.0;
   }
-
-  public String pickTopCandidate(Set<String> candidateQuery, LanguageModel languageModel,
-      NoisyChannelModel nsm) {
-    return null;
-  }
+  
 }

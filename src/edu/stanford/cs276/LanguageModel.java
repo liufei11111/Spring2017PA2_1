@@ -1,15 +1,25 @@
 package edu.stanford.cs276;
 
+import edu.stanford.cs276.util.Pair;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import edu.stanford.cs276.util.Dictionary;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -24,7 +34,7 @@ public class LanguageModel implements Serializable {
 	private static final long serialVersionUID = 1L;
   private static LanguageModel lm_;
 
-  Dictionary unigram = new Dictionary();
+  Dictionary dictionary = new Dictionary();
 
   /*
    * Feel free to add more members here (e.g., a data structure that stores bigrams)
@@ -61,17 +71,117 @@ public class LanguageModel implements Serializable {
       }
       System.out.printf("Reading data file %s ...\n", file.getName());
       BufferedReader input = new BufferedReader(new FileReader(file));
+
+      Set<Character> allChar = new HashSet<>();
+
       String line = null;
       while ((line = input.readLine()) != null) {
         /*
          * Remember: each line is a document (refer to PA2 handout)
-         * TODO: Your code here
+         *
          */
-        unigram.add("cs276");
+        line.replaceAll("_"," ");
+        line.replaceAll("\\s+","\\s ");
+        String[] tokens = line.trim().split(" ");
+        for (int i=0;i<tokens.length;++i){
+          boolean foundNum = containsNumber(tokens[i],allChar);
+          if (foundNum){continue;}
+          if (i!=tokens.length-1){
+            Pair<String,String> bigramPair = new Pair<>(tokens[i],tokens[i+1]);
+            if (dictionary.bigram.containsKey(bigramPair)){
+              dictionary.bigram.put(bigramPair,dictionary.bigram.get(bigramPair)+1);
+            }else{
+              dictionary.bigram.put(bigramPair,1);
+            }
+          }
+          if (dictionary.unigram.containsKey(tokens[i])){
+            dictionary.unigram.put(tokens[i],dictionary.unigram.get(tokens[i])+1);
+
+          }else{
+            dictionary.unigram.put(tokens[i],1);
+          }
+          dictionary.termCount++;
+        }
+
       }
+      FileWriter fw = new FileWriter(new File("unigram.txt"));
+      FileWriter fw1 = new FileWriter(new File("nonExistenceChars.txt"));
+      FileWriter fw2 = new FileWriter(new File("completeChars.txt"));
+      FileWriter fw3 = new FileWriter(new File("orderbylength.txt"));
+      FileWriter fw4 = new FileWriter(new File("orderbylengthgold.txt"));
+      List<Entry<String,Integer>> list = new ArrayList<>(dictionary.unigram.entrySet());
+      Collections.sort(list, new Comparator<Entry<String, Integer>>() {
+        @Override
+        public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
+          return o2.getValue().compareTo(o1.getValue());
+        }
+      });
+      for (int i=0;i<list.size();++i){
+        fw.write(list.get(i).getKey()+","+list.get(i).getValue()+"\n");
+      }
+      fw.close();
+      Collections.sort(list, new Comparator<Entry<String, Integer>>() {
+        @Override
+        public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
+          return o2.getKey().length()-(o1.getKey().length());
+        }
+      });
+      for (int i=0;i<list.size();++i){
+        fw3.write(list.get(i).getKey()+","+list.get(i).getValue()+"\n");
+      }
+      fw3.close();
+      Set<Character> goldCharSet = new HashSet<>();
+      BufferedReader gold = new BufferedReader(new FileReader("data/dev_set/gold.txt"));
+      HashMap<String, Integer> goldDic = new HashMap<>();
+      while ((line = input.readLine())!= null){
+        for (String str : line.split(" ")){
+          if (goldDic.containsKey(str)){
+            goldDic.put(str,goldDic.get(str)+1);
+          }else{
+            goldDic.put(str,1);
+          }
+        }
+        for (char aChar : line.toCharArray()){
+          goldCharSet.add(aChar);
+        }
+      }
+      list = new ArrayList<>(goldDic.entrySet());
+      Collections.sort(list, new Comparator<Entry<String, Integer>>() {
+        @Override
+        public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
+          return o2.getValue().compareTo(o1.getValue());
+        }
+      });
+      for (Entry<String,Integer> entry:list){
+        fw4.write(entry.getKey()+","+entry.getValue()+"\n");
+      }
+      for(Character oneChar : allChar){
+        fw2.write(oneChar+"\n");
+      }
+      allChar.removeAll(goldCharSet);
+      for (Character ch : allChar){
+        fw1.write(ch+"\n");
+      }
+      fw1.close();
+      fw2.close();
+      fw3.close();
+        gold.close();
       input.close();
     }
     System.out.println("Done.");
+  }
+
+  private boolean containsNumber(String str, Set<Character> allChar) {
+    boolean foundNum = false;
+    for (char aChar : str.toCharArray()){
+      if (Character.isDigit(aChar)){
+        foundNum=true;
+        break;
+      }
+      // TODO remove test
+      allChar.add(aChar);
+    }
+    return foundNum;
   }
 
   /**

@@ -81,7 +81,7 @@ public class LanguageModel implements Serializable {
          *
          */
         line= line.replaceAll("_+"," ");
-        line = line.replaceAll("\\s+","\\s");
+        line = line.replaceAll("\\s+"," ");
         String[] tokens = line.trim().split(" ");
         for (int i=0;i<tokens.length;++i){
           boolean foundNum = containsNumber(tokens[i],allChar);

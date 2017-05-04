@@ -9,16 +9,17 @@ import java.util.Set;
 
 public class Dictionary implements Serializable {
 
-  private int termCount;
-  private HashMap<String, Integer> unigram;
-  private HashMap<Pair<String,String>, Integer> bigram;
+  public int termCount;
+  public  HashMap<String, Integer> unigram;
+  public  HashMap<Pair<String,String>, Integer> bigram;
   public int termCount() {
     return termCount;
   }
 
   public Dictionary() {
     termCount = 0;
-    unigram = new HashMap<String, Integer>();
+    unigram = new HashMap<>();
+    bigram = new HashMap<>();
   }
 
   public void add(String term) {

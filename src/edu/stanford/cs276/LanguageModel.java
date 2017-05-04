@@ -84,9 +84,9 @@ public class LanguageModel implements Serializable {
         line = line.replaceAll("\\s+"," ");
         String[] tokens = line.trim().split(" ");
         for (int i=0;i<tokens.length;++i){
-          boolean foundNum = containsNumber(tokens[i],allChar);
+          boolean foundNum = containsNumberOrTooLong(tokens[i],allChar);
           if (foundNum){continue;}
-          if (i!=tokens.length-1){
+          if (i!=tokens.length-1&&containsNumberOrTooLong(tokens[i+1],allChar)){
             Pair<String,String> bigramPair = new Pair<>(tokens[i],tokens[i+1]);
             if (dictionary.bigram.containsKey(bigramPair)){
               dictionary.bigram.put(bigramPair,dictionary.bigram.get(bigramPair)+1);
@@ -171,7 +171,8 @@ public class LanguageModel implements Serializable {
     System.out.println("Done.");
   }
 
-  private boolean containsNumber(String str, Set<Character> allChar) {
+  private boolean containsNumberOrTooLong(String str, Set<Character> allChar) {
+    if (str.length()>25){return true;}
     boolean foundNum = false;
     for (char aChar : str.toCharArray()){
       if (Character.isDigit(aChar)){

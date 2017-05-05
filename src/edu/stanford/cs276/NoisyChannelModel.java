@@ -28,7 +28,9 @@ public class NoisyChannelModel implements Serializable {
    * Feel free to add more members here.
    * Your code here ...
    */
-
+  public EditCostModel getEditCostModel(){
+    return ecm_;
+  }
   /**
    * Constructor
    * IMPORTANT NOTE: you should NOT change the access level for this constructor to 'public', 

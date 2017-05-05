@@ -5,13 +5,14 @@ import edu.stanford.cs276.NoisyChannelModel;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class Dictionary implements Serializable {
 
   public int termCount;
-  public  HashMap<String, Integer> unigram;
-  public  HashMap<Pair<String,String>, Integer> bigram;
+  public Map<String, Integer> unigram;
+  public Map<Pair<String,String>, Integer> bigram;
   public int termCount() {
     return termCount;
   }

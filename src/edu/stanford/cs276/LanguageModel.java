@@ -1,24 +1,20 @@
 package edu.stanford.cs276;
 
+import edu.stanford.cs276.util.MapEncoder;
 import edu.stanford.cs276.util.Pair;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.RandomAccessFile;
 import java.io.Serializable;
 
 import edu.stanford.cs276.util.Dictionary;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.nio.ByteBuffer;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -34,7 +30,7 @@ public class LanguageModel implements Serializable {
 	private static final long serialVersionUID = 1L;
   private static LanguageModel lm_;
 
-  Dictionary dictionary = new Dictionary();
+  public Dictionary dict = new Dictionary();
 
   /*
    * Feel free to add more members here (e.g., a data structure that stores bigrams)
@@ -97,26 +93,26 @@ public class LanguageModel implements Serializable {
           if (foundNum){continue;}
           if (i!=tokens.length-1&&!containsNumberOrTooLong(tokens[i+1])){
             Pair<String,String> bigramPair = new Pair<>(tokens[i],tokens[i+1]);
-            if (dictionary.bigram.containsKey(bigramPair)){
-              dictionary.bigram.put(bigramPair,dictionary.bigram.get(bigramPair)+1);
+            if (dict.bigram.containsKey(bigramPair)){
+              dict.bigram.put(bigramPair, dict.bigram.get(bigramPair)+1);
             }else{
-              dictionary.bigram.put(bigramPair,1);
+              dict.bigram.put(bigramPair,1);
             }
           }
-          if (dictionary.unigram.containsKey(tokens[i])){
-            dictionary.unigram.put(tokens[i],dictionary.unigram.get(tokens[i])+1);
+          if (dict.unigram.containsKey(tokens[i])){
+            dict.unigram.put(tokens[i], dict.unigram.get(tokens[i])+1);
 
           }else{
-            dictionary.unigram.put(tokens[i],1);
+            dict.unigram.put(tokens[i],1);
           }
-          dictionary.termCount++;
+          dict.termCount++;
         }
 
       }
 
 
     }
-//    List<Entry<String,Integer>> list = new ArrayList<>(dictionary.unigram.entrySet());
+//    List<Entry<String,Integer>> list = new ArrayList<>(dict.unigram.entrySet());
 //    Collections.sort(list, new Comparator<Entry<String, Integer>>() {
 //      @Override
 //      public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
@@ -164,7 +160,7 @@ public class LanguageModel implements Serializable {
 //      fw4.write(entry.getKey()+","+entry.getValue()+"\n");
 //    }
 //    Set<String> setNotInGoldInDIc = goldDic.keySet();
-//    setNotInGoldInDIc.removeAll(dictionary.unigram.keySet());
+//    setNotInGoldInDIc.removeAll(dict.unigram.keySet());
 //    for (String str : setNotInGoldInDIc){
 //      fw5.write(str+"\n");
 //    }
@@ -180,7 +176,7 @@ public class LanguageModel implements Serializable {
   }
 
   private boolean containsNumberOrTooLong(String str) {
-    if (str.length()>25){return true;}
+    if (str.length()>Config.wordThreshold){return true;}
     boolean foundNum = false;
     for (char aChar : str.toCharArray()){
       if (Character.isDigit(aChar)){
@@ -211,9 +207,15 @@ public class LanguageModel implements Serializable {
         FileInputStream fiA = new FileInputStream(Config.languageModelFile);
         ObjectInputStream oisA = new ObjectInputStream(fiA);
         lm_ = (LanguageModel) oisA.readObject();
+        MapEncoder me = new MapEncoder();
+        Map<String, Integer> unigram = me.retrieveUnigram();
+        Map<Pair<String,String>,Integer> bigram = me.retrieveBigram();
+        lm_.dict.unigram=unigram;
+        lm_.dict.bigram=bigram;
       }
     } catch (Exception e) {
-      throw new Exception("Unable to load language model.  You may not have run buildmodels.sh!");
+      throw e;
+//      throw new Exception("Unable to load language model.  You may not have run buildmodels.sh!");
     }
     return lm_;
   }
@@ -224,11 +226,48 @@ public class LanguageModel implements Serializable {
   public void save() throws Exception {
     FileOutputStream saveFile = new FileOutputStream(Config.languageModelFile);
     ObjectOutputStream save = new ObjectOutputStream(saveFile);
+
+    MapEncoder me = new MapEncoder();
+    me.saveUnigram(dict.unigram);
+    me.saveBigram(dict.bigram);
+    dict.unigram = null;
+    dict.bigram = null;
     save.writeObject(this);
     save.close();
   }
 
   public String pickTopCandidate(Set<String> candidateQuery, NoisyChannelModel nsm) {
     return null;
+  }
+
+  public double genLanguageScore(String[] terms, String original) {
+    return 0.0;
+  }
+  public double unigramProbForTerm(String term) {
+    Integer count = dict.unigram.get(term);
+    if (count == null){
+      return Math.log(Config.eps);
+    }else{
+      return Math.log(count)-Math.log(dict.termCount);
+    }
+  }
+  public double getConditionalProd(String term1, String term2) {
+    double unigramScore = unigramProbForTerm(term2);
+    if (term1 == null){
+      return unigramScore*2;
+    }
+    double termUnigram = rawCountForTerm(term1);
+    double countBigram = rawBiCountForTerms(term1,term2);
+    double bigramScore = Math.log(countBigram)-Math.log(termUnigram+Config.eps);
+    // we use bigram to decide which word is wrong. and we just need to log of count and total is constant and can be ignored
+    return  unigramScore*Config.smoothingFactor+bigramScore*(1-Config.smoothingFactor);
+  }
+
+  private double rawBiCountForTerms(String term1, String term2) {
+    return 0.0;
+  }
+
+  private double rawCountForTerm(String term1) {
+    return 0.0;
   }
 }

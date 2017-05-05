@@ -236,12 +236,10 @@ public class LanguageModel implements Serializable {
     save.close();
   }
 
-  public String pickTopCandidate(Set<String> candidateQuery, NoisyChannelModel nsm) {
-    return null;
-  }
 
-  public double genLanguageScore(String[] terms, String original) {
-    return 0.0;
+
+  public double genLanguageScore(String[] terms) {
+    return jointProbScore(terms);
   }
   public double unigramProbForTerm(String term) {
     Integer count = dict.unigram.get(term);
@@ -264,10 +262,35 @@ public class LanguageModel implements Serializable {
   }
 
   private double rawBiCountForTerms(String term1, String term2) {
-    return 0.0;
+    Integer count = dict.bigram.get(new Pair<>(term1,term2));
+    if (count == null){
+      return Math.log(Config.eps);
+    }else{
+      return Math.log(count)-Math.log(dict.termCount);
+    }
   }
 
   private double rawCountForTerm(String term1) {
-    return 0.0;
+    Integer count = dict.unigram.get(term1);
+    if (count == null){
+      return Math.log(Config.eps);
+    }else{
+      return Math.log(count)-Math.log(dict.termCount);
+    }
+  }
+
+  public  double jointProbScore(String[] terms) {
+//    String[] terms = query.split(" ");
+    double logLanguageScore = 0.0; // log 1
+    for(int i=0;i<terms.length-1;++i){
+      if (i==0) {
+        // raw count is good as the total count is a constant
+        logLanguageScore += unigramProbForTerm(terms[i]);
+      }
+
+      logLanguageScore+=getConditionalProd(terms[i],terms[i+1]);
+
+    }
+    return logLanguageScore;
   }
 }

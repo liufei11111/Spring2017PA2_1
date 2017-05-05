@@ -74,7 +74,8 @@ public class RunCorrector {
 
       String correctedQuery = query;
       Set<String> candidateQuery = CandidateGenerator.get().getCandidates(query,languageModel,nsm);
-      correctedQuery = languageModel.pickTopCandidate(candidateQuery,nsm);
+      QueryPicker picker = new QueryPicker();
+      correctedQuery = picker.getBestQuery(candidateQuery,languageModel,nsm,CandidateGenerator.get(),query);
       /*
        * Your code here: currently the correctQuery and original query are the same
        * Complete this implementation so that the spell corrector corrects the 

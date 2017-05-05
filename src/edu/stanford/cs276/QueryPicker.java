@@ -73,17 +73,18 @@ public class QueryPicker {
     String goldQuery = null;
     String inputQuery = null;
     String candSetPerQuery = null;
-    int squareSize = 1;
-    for (int i=0;i<squareSize;++i){
+    int languageModelScaleingFactorSpace = 100;
+    int bigramSmoothingFactor = 10;
+    for (int i=0;i<languageModelScaleingFactorSpace;++i){
 
-      for (int j=0;j<squareSize;++j) {
-    evaludateTestFile( squareSize, goldFilePath,  i,  j,  languageModel, nsm);
+      for (int j=0;j<bigramSmoothingFactor;++j) {
+        evaludateTestFile( languageModelScaleingFactorSpace,bigramSmoothingFactor, goldFilePath,  i,  j,  languageModel, nsm);
 //
 
       }
     }
   }
-  public static void evaludateTestFile(int squareSize,String goldFilePath, int i, int j, LanguageModel languageModel,NoisyChannelModel nsm)
+  public static void evaludateTestFile(int iSize,int jSize ,String goldFilePath, int i, int j, LanguageModel languageModel,NoisyChannelModel nsm)
       throws IOException {
     BufferedReader goldFileReader = null;
     if (goldFilePath != null) {
@@ -91,10 +92,10 @@ public class QueryPicker {
     }
         //  public static double languageModelScalingFactor = 0.99;
 //        public static double smoothingFactor=0.1;
-    Config.smoothingFactor = 0.1 - squareSize / 180 * (j + 1);
-    Config.languageModelScalingFactor = 1 - squareSize / 18 * (i + 1);
+    Config.smoothingFactor = j*1.0 / jSize * (i + 1);
+    Config.languageModelScalingFactor = i*4.0 /iSize* (j + 1);
     FileWriter compareFile = new FileWriter(
-        new File("Cand_gold_diff_" + i + "_" + j + "_" + ".txt"));
+        new File("test_result/Cand_gold_diff_" + i + "_" + j + "_" + ".txt"));
 
     BufferedReader brCanSet = new BufferedReader(new FileReader(new File("Cand_set.txt")));
     QueryPicker qp = new QueryPicker();

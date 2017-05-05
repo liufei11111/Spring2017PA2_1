@@ -1,0 +1,8 @@
+./memusg -o output/index_memory_out ./task1/index.sh ./pa1-data output/index > output/filecount.txt
+./memusg -o output/query_memory_out ./task1/query.sh output/index < dev_queries/query.1 > output/query_out/query.1
+
+
+sudo docker run -it --rm -v /home/feiliu/workspace/cs276_hw1/Spring2017Hw1Sync/pa1-skeleton:/pa-skeleton --name cs276_hw1_running java /bin/bash
+
+time ./buildmodels.sh data/corpus data/training_set/edit1s.txt 
+

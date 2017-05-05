@@ -135,7 +135,7 @@ public class QueryPicker {
           //          }else{
           String chosen = qp.getBestQuery(canset, languageModel,
               nsm, CandidateGenerator.get(), firstParse[0]);
-          if (!chosen.equals(firstParse[0])) {
+          if (!chosen.equals(goldQuery)) {
             compareFile
                 .write("Chosen: " + ", Gold: " + goldQuery + ", Original: " + firstParse[0]);
           }
@@ -184,8 +184,11 @@ public static void generateTestFiles(String goldFilePath, String querFile,
 
 //      System.out.print(sb.toString());
     }
+
     sb.setLength(sb.length()-1);
+//    sb.append(";"+goldQuery)
     candidateSetFile.write(sb.toString());
+
     candidateSetFile.write(System.lineSeparator());
   }
       candidateSetFile.close();

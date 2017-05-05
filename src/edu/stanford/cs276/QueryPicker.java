@@ -74,7 +74,7 @@ public class QueryPicker {
     String inputQuery = null;
     String candSetPerQuery = null;
     int languageModelScaleingFactorSpace = 100;
-    int bigramSmoothingFactor = 10;
+    int bigramSmoothingFactor = 50;
     for (int i=0;i<languageModelScaleingFactorSpace;++i){
 
       for (int j=0;j<bigramSmoothingFactor;++j) {

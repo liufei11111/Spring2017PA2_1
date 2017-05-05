@@ -11,8 +11,8 @@ public class UniformCostModel implements EditCostModel {
 	
   @Override
   public double editProbability(String original, String R, int distance) {
-    int dis = editDistDP(original,R);
-    return Math.log(Config.singleEditProb)*dis;
+//    int dis = editDistDP(original,R);
+    return Math.log(Config.singleEditProb)*distance;
   }
   static int editDistDP(String str1, String str2){
     int m = str1.length();

@@ -81,7 +81,7 @@ public class QueryPicker {
         Config.languageModelScalingFactor = 1-squareSize/18*(i+1);
         FileWriter compareFile = new FileWriter(new File("Cand_gold_diff_"+i+"_"+j+"_"+".txt"));
 //    FileWriter candidateSetFile = new FileWriter(new File("Cand_set.txt"));
-        BufferedReader brCanSet =new BufferedReader(new FileReader(new File("Cand_set_"+i+"_"+j+"_"+".txt")));
+        BufferedReader brCanSet =new BufferedReader(new FileReader(new File("Cand_set.txt")));
         QueryPicker qp = new QueryPicker();
         while(((goldQuery = goldFileReader.readLine()) != null)||(candSetPerQuery = brCanSet.readLine()) != null){
           String[] firstParse = candSetPerQuery.split("$$$");

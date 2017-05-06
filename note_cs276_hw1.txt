@@ -6,9 +6,13 @@ sudo docker run -it --rm -v /home/feiliu/workspace/cs276_hw1/Spring2017Hw1Sync/p
 
 time ./buildmodels.sh data/corpus data/training_set/edit1s.txt 
 
- time java -Xmx6024m -cp classes edu.stanford.cs276.QueryPicker uniform data/dev_set/queries.txt extra  data/dev_set/gold.txt
+# first time
+time java -Xmx6024m -cp classes edu.stanford.cs276.QueryPicker uniform data/dev_set/queries.txt extra  data/dev_set/gold.txt
+# there after
+time java -Xmx6024m -cp classes edu.stanford.cs276.QueryPicker uniform data/dev_set/queries.txt  data/dev_set/gold.txt
 
- ls | grep -v Prob | sort | xargs -I {} bash -c "cat {} | wc -l;echo {}"
+
+ls | grep -v Prob | sort | xargs -I {} bash -c "cat {} | wc -l;echo {}"
 
 sed -n 16224,16482p filename > newfile
 

@@ -79,7 +79,7 @@ public class QueryPicker {
 //    String candSetPerQuery = null;
 //    int languageModelScaleingFactorSpace = 100;
 //    int editProdSpace = 50;
-    int languageModelScaleingFactorSpace = 120;
+    int languageModelScaleingFactorSpace = 100;
     int editProdSpace = 1;
 //    int editProdSpace = 80;
     for (int i=0;i<languageModelScaleingFactorSpace;++i){

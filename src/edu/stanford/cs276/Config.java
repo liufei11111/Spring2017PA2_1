@@ -6,7 +6,7 @@ public class Config {
   public static final String candidateGenFile = "candidateGenerator";
   public static final String unigramFile = "unigram.txt";
   public static final String bigramFile = "bigram.txt";
-  public static double languageModelScalingFactor = 0.4;// empirical value
+  public static double languageModelScalingFactor = 0.05;// empirical value
   public static double singleEditProb = 0.01;// 145 .. from 0.005 - 0.1 roughtly the same
 
 

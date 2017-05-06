@@ -79,7 +79,7 @@ public class QueryPicker {
 //    String candSetPerQuery = null;
 //    int languageModelScaleingFactorSpace = 100;
 //    int editProdSpace = 50;
-    int languageModelScaleingFactorSpace = 1;
+    int languageModelScaleingFactorSpace = 100;
     int editProdSpace = 1;
 //    int editProdSpace = 80;
     for (int i=0;i<languageModelScaleingFactorSpace;++i){
@@ -98,7 +98,7 @@ public class QueryPicker {
       goldFileReader = new BufferedReader(new FileReader(new File(goldFilePath)));
     }
 
-//    Config.languageModelScalingFactor = (j+1)*4.0 / jSize ;
+    Config.languageModelScalingFactor = (j+1)*0.01 / jSize ;
 //    Config.singleEditProb = (i+1)*0.1 /iSize;
     FileWriter compareFile = new FileWriter(
         new File("test_result/Cand_gold_diff_" + i + "_" + j + "_" + ".txt"));

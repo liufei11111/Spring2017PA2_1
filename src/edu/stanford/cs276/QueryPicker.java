@@ -78,16 +78,16 @@ public class QueryPicker {
     String inputQuery = null;
 //    String candSetPerQuery = null;
 //    int languageModelScaleingFactorSpace = 100;
-//    int bigramSmoothingFactor = 50;
+//    int editProdSpace = 50;
     int languageModelScaleingFactorSpace = 1;
-    int bigramSmoothingFactor = 20;
-//    int bigramSmoothingFactor = 1;
+//    int editProdSpace = 20;
+    int editProdSpace = 20;
     for (int i=0;i<languageModelScaleingFactorSpace;++i){
 
-      for (int j=0;j<bigramSmoothingFactor;++j) {
-        evaludateTestFile( languageModelScaleingFactorSpace,bigramSmoothingFactor, goldFilePath,  i,  j,  languageModel, nsm);
+      for (int j=0;j<editProdSpace;++j) {
+        evaludateTestFile( languageModelScaleingFactorSpace,editProdSpace, goldFilePath,  i,  j,  languageModel, nsm);
 //
-        System.out.println(i+" out of "+languageModelScaleingFactorSpace+", "+j+" out of "+bigramSmoothingFactor +" is done.");
+        System.out.println(i+" out of "+languageModelScaleingFactorSpace+", "+j+" out of "+editProdSpace +" is done.");
       }
     }
   }
@@ -98,7 +98,7 @@ public class QueryPicker {
       goldFileReader = new BufferedReader(new FileReader(new File(goldFilePath)));
     }
 
-    Config.smoothingFactor = j*1.0 / jSize * (i + 1);
+    Config.singleEditProb = j*1.0 / jSize * (i + 1);
 //    Config.languageModelScalingFactor = i*4.0 /iSize* (j + 1);
     FileWriter compareFile = new FileWriter(
         new File("test_result/Cand_gold_diff_" + i + "_" + j + "_" + ".txt"));

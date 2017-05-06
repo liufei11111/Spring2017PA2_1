@@ -81,7 +81,7 @@ public class QueryPicker {
 //    int editProdSpace = 50;
     int languageModelScaleingFactorSpace = 1;
 //    int editProdSpace = 20;
-    int editProdSpace = 20;
+    int editProdSpace = 80;
     for (int i=0;i<languageModelScaleingFactorSpace;++i){
 
       for (int j=0;j<editProdSpace;++j) {
@@ -98,7 +98,7 @@ public class QueryPicker {
       goldFileReader = new BufferedReader(new FileReader(new File(goldFilePath)));
     }
 
-    Config.singleEditProb = j*0.1 / jSize * (i + 1);
+    Config.languageModelScalingFactor = j*4.0 / jSize * (i + 1);
 //    Config.languageModelScalingFactor = i*4.0 /iSize* (j + 1);
     FileWriter compareFile = new FileWriter(
         new File("test_result/Cand_gold_diff_" + i + "_" + j + "_" + ".txt"));

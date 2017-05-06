@@ -151,7 +151,7 @@ public class QueryPicker {
 
         Pair<String,Integer> chosen = qp.getBestQuery(canset, languageModel,
             nsm, CandidateGenerator.get(), originalQuery,compareProbFile);
-        if (!goldQuery.equals(chosen)) {
+        if (!goldQuery.equals(chosen.getFirst())) {
           compareFile
               .write("Chosen: " + chosen+", Gold: " + goldQuery + ", Original: " + originalQuery+"\n");
         }

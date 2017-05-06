@@ -153,7 +153,7 @@ public class QueryPicker {
             nsm, CandidateGenerator.get(), originalQuery,compareProbFile);
         if (!goldQuery.equals(chosen.getFirst())) {
           compareFile
-              .write("Chosen: " + chosen+", Gold: " + goldQuery + ", Original: " + originalQuery+"\n");
+              .write(chosen+"," + goldQuery + "," + originalQuery+"\n");
         }
 
 
@@ -173,6 +173,7 @@ public static void generateTestFiles(String goldFilePath, String querFile,
   BufferedReader queriesFileReader = new BufferedReader(new FileReader(new File(querFile)));
   FileWriter candidateSetFile = new FileWriter(new File("Cand_set.txt"));
   StringBuilder sb = new StringBuilder();
+  int i=0;
   while(((goldQuery = goldFileReader.readLine()) != null)&&(inputQuery = queriesFileReader.readLine()) != null){
 
     Map<String, HashSet<String>>candSet = CandidateGenerator.get().getCandidates(inputQuery,languageModel,nsm);
@@ -180,7 +181,7 @@ public static void generateTestFiles(String goldFilePath, String querFile,
 
 
     sb.append(inputQuery+";");
-
+//    System.out.println("Processing inputQuery: "+inputQuery);
     for (Entry<String,HashSet<String>> entry:candSet.entrySet()){
       for (String str: entry.getValue()){
         sb.append(str);
@@ -196,6 +197,8 @@ public static void generateTestFiles(String goldFilePath, String querFile,
     candidateSetFile.write(System.lineSeparator());
   }
       candidateSetFile.close();
+  queriesFileReader.close();
+  goldFileReader.close();
 }
   public Pair<String,Integer> getBestQuery(Set<Pair<String,String>> candSet, LanguageModel languageModel,
       NoisyChannelModel nsm, CandidateGenerator canG, String original, FileWriter testInfoWriter) throws Exception {
@@ -208,7 +211,9 @@ public static void generateTestFiles(String goldFilePath, String querFile,
       double noisyScore = nsm.getEditCostModel().editProbability(original,str.getFirst(),str.getSecond());
       double languageScore = languageModel.genLanguageScore(terms);
       double candScore = noisyScore+Config.languageModelScalingFactor * languageScore;
-      candidateBuffer.append(str+":: <"+languageScore+","+noisyScore+","+candScore+">|");
+      // TODO remove test
+      if (testOutput != null){candidateBuffer.append(testOutput.getFirst()+":"+languageScore+","+noisyScore+","+candScore);}
+      //
       if (bestCand == null){
         bestCand = new Pair<>(str.getFirst(),candScore);
         testOutput = new Pair(str.getFirst(),(int)(str.getSecond().charAt(0)-'0'));
@@ -220,7 +225,9 @@ public static void generateTestFiles(String goldFilePath, String querFile,
       }
 
     }
-    if (false){
+
+
+    if (true){
       testInfoWriter.write(candidateBuffer.toString()+"\n");
     }
 

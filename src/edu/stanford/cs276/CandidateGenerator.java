@@ -585,7 +585,7 @@ public class CandidateGenerator implements Serializable {
     }
 
     coun++;
-    System.err.println(coun);
+    System.out.println(query);
     return candidates;
   }
   private String joinStrings(String[] strs){

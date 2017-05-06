@@ -79,7 +79,7 @@ public class QueryPicker {
 //    String candSetPerQuery = null;
 //    int languageModelScaleingFactorSpace = 100;
 //    int editProdSpace = 50;
-    int languageModelScaleingFactorSpace = 100;
+    int languageModelScaleingFactorSpace = 120;
     int editProdSpace = 1;
 //    int editProdSpace = 80;
     for (int i=0;i<languageModelScaleingFactorSpace;++i){
@@ -98,7 +98,7 @@ public class QueryPicker {
       goldFileReader = new BufferedReader(new FileReader(new File(goldFilePath)));
     }
 
-    Config.languageModelScalingFactor = (j+1)*0.2 / jSize ;
+    Config.languageModelScalingFactor = (j+1)*0.5 / jSize ;
 //    Config.singleEditProb = (i+1)*0.1 /iSize;
     String indexI = ""+i;
     String indexJ = ""+j;

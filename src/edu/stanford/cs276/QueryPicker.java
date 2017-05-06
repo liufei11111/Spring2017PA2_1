@@ -67,7 +67,7 @@ public class QueryPicker {
     NoisyChannelModel nsm = NoisyChannelModel.load();
     BufferedReader queriesFileReader = new BufferedReader(new FileReader(new File(queryFilePath)));
     nsm.setProbabilityType(uniformOrEmpirical);
-    if (extra.equals("extra")){
+    if (extra!=null && extra.equals("extra")){
       generateTestFiles( goldFilePath, queryFilePath, languageModel, nsm);
     }
 //

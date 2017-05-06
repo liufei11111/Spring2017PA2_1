@@ -151,7 +151,7 @@ public class QueryPicker {
 
         String chosen = qp.getBestQuery(canset, languageModel,
             nsm, CandidateGenerator.get(), originalQuery,compareProbFile);
-        if (!goldQuery.equals(chosen)&&false) {
+        if (!goldQuery.equals(chosen)) {
           compareFile
               .write("Chosen: " + chosen+", Gold: " + goldQuery + ", Original: " + originalQuery+"\n");
         }
@@ -216,7 +216,10 @@ public static void generateTestFiles(String goldFilePath, String querFile,
       }
 
     }
-    testInfoWriter.write(candidateBuffer.toString()+"\n");
+    if (false){
+      testInfoWriter.write(candidateBuffer.toString()+"\n");
+    }
+
     return bestCand.getFirst();
   }
 }

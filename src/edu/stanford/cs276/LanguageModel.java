@@ -242,6 +242,10 @@ public class LanguageModel implements Serializable {
     if (count == null){
       return Math.log(Config.eps);
     }else{
+      if (term.length()<=2){
+        double rescaled = Math.log(count);
+        return Math.log(rescaled)-Math.log(dict.termCount);
+      }
       return Math.log(count)-Math.log(dict.termCount);
     }
   }

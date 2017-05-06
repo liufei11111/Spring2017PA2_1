@@ -12,18 +12,45 @@ public class UniformCostModel implements EditCostModel {
   @Override
   public double editProbability(String original, String R, int distance) {
 //    int dis = editDistDP(original,R);
+    String[] origStrs = original.split(" ");
+    String[] rStrs = R.split(" ");
+    // handle past/current tense conversion
+    if (origStrs.length == rStrs.length){
+      int len = origStrs.length;
+      for (int i=0;i<len;++i){
+        String origStr = origStrs[i];
+        int origLen = origStrs[i].length();
+        String rStr = rStrs[i];
+        int rLen = rStrs[i].length();
+        if (rLen>origLen){
+          int temp = rLen;
+          String tempStr = rStr;
+          rLen = origLen;
+          rStr = origStr;
+          origStr = tempStr;
+          origLen = temp;
 
-    if (distance == 0){
-      return Math.log(1-Config.singleEditProb);
-    }else{
-      double combinorial = 0.0;
-      double n = original.length();
-      for (int k=distance;k>=1;--k){
-        combinorial += Math.log(n-k+1.0)-Math.log(k);
-        combinorial += k*Math.log(Config.singleEditProb)+(n-k)*Math.log(1-Config.singleEditProb);
+        }
+
+        if (origLen-rLen<=2&& origStr.length()>=4&&origStr.substring(origLen-2).equals("ed")&&rLen>=3&&rStr.charAt(rLen-1)=='s'){
+            System.out.println("Original: "+original+", R: "+R+", distance: "+distance);
+            distance-=2;
+
+        }else if(origStr.length()>2&&origStr.charAt(origLen-1)=='s'&&origStr.substring(0,origLen-1).equals(rStr)){
+          distance-=1;
+        }
+
       }
-      return Math.log(Config.singleEditProb)+combinorial;
+
+
+
     }
+      if (distance >=1){
+        return Math.log(Config.singleEditProb)*distance;
+      }else{
+        return Math.log(1-Config.singleEditProb);
+      }
+
 
   }
   static int editDistDP(String str1, String str2){

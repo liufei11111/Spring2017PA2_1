@@ -10,4 +10,5 @@ time ./buildmodels.sh data/corpus data/training_set/edit1s.txt
 
  ls | grep -v Prob | sort | xargs -I {} bash -c "cat {} | wc -l;echo {}"
 
+sed -n 16224,16482p filename > newfile
 

@@ -79,9 +79,9 @@ public class QueryPicker {
 //    String candSetPerQuery = null;
 //    int languageModelScaleingFactorSpace = 100;
 //    int editProdSpace = 50;
-    int languageModelScaleingFactorSpace = 1;
-//    int editProdSpace = 20;
-    int editProdSpace = 80;
+    int languageModelScaleingFactorSpace = 20;
+    int editProdSpace = 20;
+//    int editProdSpace = 80;
     for (int i=0;i<languageModelScaleingFactorSpace;++i){
 
       for (int j=0;j<editProdSpace;++j) {
@@ -98,12 +98,12 @@ public class QueryPicker {
       goldFileReader = new BufferedReader(new FileReader(new File(goldFilePath)));
     }
 
-    Config.languageModelScalingFactor = j*4.0 / jSize * (i + 1);
-//    Config.languageModelScalingFactor = i*4.0 /iSize* (j + 1);
+    Config.languageModelScalingFactor = (j+1)*4.0 / jSize ;
+    Config.singleEditProb = (i+1)*0.1 /iSize;
     FileWriter compareFile = new FileWriter(
         new File("test_result/Cand_gold_diff_" + i + "_" + j + "_" + ".txt"));
-    FileWriter compareProbFile = new FileWriter(
-        new File("test_result/Cand_gold_diff_Prob_" + i + "_" + j + "_" + ".txt"));
+//    FileWriter compareProbFile = new FileWriter(
+//        new File("test_result/Cand_gold_diff_Prob_" + i + "_" + j + "_" + ".txt"));
 
     BufferedReader brCanSet = new BufferedReader(new FileReader(new File("Cand_set.txt")));
     QueryPicker qp = new QueryPicker();
@@ -139,7 +139,7 @@ public class QueryPicker {
         canset.add(new Pair<>(candSetPerQuery,0));
 
         String chosen = qp.getBestQuery(canset, languageModel,
-            nsm, CandidateGenerator.get(), originalQuery,compareProbFile);
+            nsm, CandidateGenerator.get(), originalQuery);
         if (!goldQuery.equals(chosen)) {
           compareFile
               .write("Chosen: " + chosen+", Gold: " + goldQuery + ", Original: " + originalQuery+"\n");
@@ -151,7 +151,7 @@ public class QueryPicker {
       e.printStackTrace();
     }
     goldFileReader.close();
-    compareProbFile.close();
+//    compareProbFile.close();
     brCanSet.close();
   }
 public static void generateTestFiles(String goldFilePath, String querFile,
@@ -187,16 +187,16 @@ public static void generateTestFiles(String goldFilePath, String querFile,
       candidateSetFile.close();
 }
   public String getBestQuery(Set<Pair<String,Integer>> candSet, LanguageModel languageModel,
-      NoisyChannelModel nsm, CandidateGenerator canG, String original, FileWriter testInfoWriter) throws Exception {
+      NoisyChannelModel nsm, CandidateGenerator canG, String original) throws Exception {
     Pair<String,Double> bestCand = null;
-    StringBuffer candidateBuffer = new StringBuffer();
-    candidateBuffer.append(original+"$");
+//    StringBuffer candidateBuffer = new StringBuffer();
+//    candidateBuffer.append(original+"$");
     for (Pair<String,Integer> str : candSet){
       String[] terms = str.getFirst().split(" " );
       double noisyScore = nsm.getEditCostModel().editProbability(original,str.getFirst(),str.getSecond());
       double languageScore = languageModel.genLanguageScore(terms);
       double candScore = noisyScore+Config.languageModelScalingFactor * languageScore;
-      candidateBuffer.append(str+":: <"+languageScore+","+noisyScore+","+candScore+">|");
+//      candidateBuffer.append(str+":: <"+languageScore+","+noisyScore+","+candScore+">|");
       if (bestCand == null){
         bestCand = new Pair<>(str.getFirst(),candScore);
       }else if (candScore > bestCand.getSecond()){
@@ -205,7 +205,7 @@ public static void generateTestFiles(String goldFilePath, String querFile,
       }
 
     }
-    testInfoWriter.write(candidateBuffer.toString()+"\n");
+//    testInfoWriter.write(candidateBuffer.toString()+"\n");
     return bestCand.getFirst();
   }
 }

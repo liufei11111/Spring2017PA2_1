@@ -15,8 +15,16 @@ public class UniformCostModel implements EditCostModel {
 
     if (distance == 0){
       return Math.log(1-Config.singleEditProb);
+    }else{
+      double combinorial = 0.0;
+      double n = original.length();
+      for (int k=distance;k>=1;--k){
+        combinorial += Math.log(n-k+1.0)-Math.log(k);
+        combinorial += k*Math.log(Config.singleEditProb)+(n-k)*Math.log(1-Config.singleEditProb);
+      }
+      return Math.log(Config.singleEditProb)+combinorial;
     }
-    return Math.log(Config.singleEditProb)*distance;
+
   }
   static int editDistDP(String str1, String str2){
     int m = str1.length();

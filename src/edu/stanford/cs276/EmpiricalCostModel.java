@@ -368,22 +368,57 @@ public class EmpiricalCostModel implements EditCostModel {
     double prob = 1.0;
     int term_size = occurence.size();
     int term_tuple_size = (term_size - 1) * term_size;
-    for (int i = 0; i < distance; i++) {
+    for (int i = 0; i < processed_op; i++) {
       ArrayList<Character> tuple = new ArrayList<Character>();
       tuple.add(pre[i]);
       tuple.add(cur[i]);
+      int qwe = 0;
+      int rty = 0;
       switch(sym[i]) {
         case 'a':
-          prob = prob * (double)(ins.get(tuple) + 1) / (occurence.get(tuple.get(0)) + term_size);
-          break;
+          qwe = 0;
+          if (ins.containsKey(tuple)) {
+            qwe = ins.get(tuple);
+          }
+           rty = 0;
+         if (occurence.containsKey(tuple.get(0))) {
+           rty = occurence.get(tuple.get(0));
+         }
+         prob = prob * (double)(qwe + 1) / (rty + term_size);
+         break;
         case 'b':
-          prob = prob * (double)(del.get(tuple) + 1) / (occurence2.get(tuple) + term_tuple_size);
+          qwe = 0;
+          if (del.containsKey(tuple)) {
+            qwe = del.get(tuple);
+          }
+          rty = 0;
+          if (occurence2.containsKey(tuple)) {
+            rty = occurence2.get(tuple);
+          }
+          prob = prob * (double)(qwe + 1) / (rty + term_tuple_size);
           break;
         case 'c':
-          prob = prob * (double)(sub.get(tuple) + 1) / (occurence.get(tuple.get(1)) + term_size);
+          qwe = 0;
+          if (sub.containsKey(tuple)) {
+            qwe = sub.get(tuple);
+          }
+          rty = 0;
+          if (occurence.containsKey(tuple.get(1))) {
+            rty = occurence.get(tuple.get(1));
+          }
+          prob = prob * (double)(qwe + 1) / (rty + term_size);
           break;
         case 'd':
-          prob = prob * (double)(trans.get(tuple) + 1) / (occurence2.get(tuple) + term_tuple_size);
+          qwe = 0;
+          if (trans.containsKey(tuple)) {
+            qwe = trans.get(tuple);
+          }
+          rty = 0;
+          if (occurence2.containsKey(tuple)) {
+            rty = occurence2.get(tuple);
+          }
+          prob = prob * (double)(qwe + 1) / (rty + term_tuple_size);
+          break;
       }
     }
     return prob;

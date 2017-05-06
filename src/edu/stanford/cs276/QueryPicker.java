@@ -67,18 +67,21 @@ public class QueryPicker {
     NoisyChannelModel nsm = NoisyChannelModel.load();
     BufferedReader queriesFileReader = new BufferedReader(new FileReader(new File(queryFilePath)));
     nsm.setProbabilityType(uniformOrEmpirical);
-
-//    generateTestFiles( goldFilePath, queryFilePath, languageModel, nsm);
+    if (extra.equals("extra")){
+      generateTestFiles( goldFilePath, queryFilePath, languageModel, nsm);
+    }
+//
 
     String query = null;
 
     String goldQuery = null;
     String inputQuery = null;
-    String candSetPerQuery = null;
+//    String candSetPerQuery = null;
 //    int languageModelScaleingFactorSpace = 100;
 //    int bigramSmoothingFactor = 50;
     int languageModelScaleingFactorSpace = 1;
     int bigramSmoothingFactor = 20;
+//    int bigramSmoothingFactor = 1;
     for (int i=0;i<languageModelScaleingFactorSpace;++i){
 
       for (int j=0;j<bigramSmoothingFactor;++j) {
@@ -95,7 +98,7 @@ public class QueryPicker {
       goldFileReader = new BufferedReader(new FileReader(new File(goldFilePath)));
     }
 
-    Config.smoothingFactor = j*1.0 / jSize * (i + 1);
+//    Config.smoothingFactor = j*1.0 / jSize * (i + 1);
 //    Config.languageModelScalingFactor = i*4.0 /iSize* (j + 1);
     FileWriter compareFile = new FileWriter(
         new File("test_result/Cand_gold_diff_" + i + "_" + j + "_" + ".txt"));

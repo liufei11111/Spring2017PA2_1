@@ -33,7 +33,7 @@ public class UniformCostModel implements EditCostModel {
         }
 
         if (origLen-rLen<=2&& origStr.length()>=4&&origStr.substring(origLen-2).equals("ed")&&rLen>=3&&rStr.charAt(rLen-1)=='s'){
-            System.out.println("Original: "+original+", R: "+R+", distance: "+distance);
+//            System.out.println("Original: "+original+", R: "+R+", distance: "+distance);
             distance-=2;
 
         }else if(origStr.length()>2&&origStr.charAt(origLen-1)=='s'&&origStr.substring(0,origLen-1).equals(rStr)){

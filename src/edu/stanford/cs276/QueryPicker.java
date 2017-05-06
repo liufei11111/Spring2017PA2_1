@@ -98,7 +98,7 @@ public class QueryPicker {
       goldFileReader = new BufferedReader(new FileReader(new File(goldFilePath)));
     }
 
-    Config.languageModelScalingFactor = (j+1)*0.01 / jSize ;
+    Config.languageModelScalingFactor = (j+1)*0.2 / jSize ;
 //    Config.singleEditProb = (i+1)*0.1 /iSize;
     FileWriter compareFile = new FileWriter(
         new File("test_result/Cand_gold_diff_" + i + "_" + j + "_" + ".txt"));

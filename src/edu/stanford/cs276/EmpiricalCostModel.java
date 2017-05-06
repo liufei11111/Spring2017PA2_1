@@ -351,6 +351,15 @@ public class EmpiricalCostModel implements EditCostModel {
       }
     }
     if (!success) {
+      if (distance != 2) {
+        System.err.println("impossbile!");
+      } else {
+        if (op1 == 'b' && op2 == 'd') {
+        } else if (op1 =='d' && op2 == 'b') {
+        } else {
+          System.err.println("impossible v2!");
+        }
+      }
       // I have verfied that every case is indeed impossbile!
       // e.g. orf -> for, irn-> ni.
       return 0.0;

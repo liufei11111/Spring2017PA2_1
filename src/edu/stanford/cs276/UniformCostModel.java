@@ -10,7 +10,8 @@ public class UniformCostModel implements EditCostModel {
 	private static final long serialVersionUID = 1L;
 	
   @Override
-  public double editProbability(String original, String R, int distance) {
+  public double editProbability(String original, String R, String distance) {
+    int dis =(int) (distance.charAt(0)-'0');
 //    int dis = editDistDP(original,R);
     String[] origStrs = original.split(" ");
     String[] rStrs = R.split(" ");
@@ -33,11 +34,11 @@ public class UniformCostModel implements EditCostModel {
         }
 
         if (origLen-rLen<=2&& origStr.length()>=4&&origStr.substring(origLen-2).equals("ed")&&rLen>=3&&rStr.charAt(rLen-1)=='s'){
-//            System.out.println("Original: "+original+", R: "+R+", distance: "+distance);
-            distance-=2;
+//            System.out.println("Original: "+original+", R: "+R+", dis: "+dis);
+          dis-=2;
 
         }else if(origStr.length()>2&&origStr.charAt(origLen-1)=='s'&&origStr.substring(0,origLen-1).equals(rStr)){
-          distance-=1;
+          dis-=1;
         }
 
       }
@@ -45,8 +46,8 @@ public class UniformCostModel implements EditCostModel {
 
 
     }
-      if (distance >=1){
-        return Math.log(Config.singleEditProb)*distance;
+      if (dis >=1){
+        return Math.log(Config.singleEditProb)*dis;
       }else{
         return Math.log(1-Config.singleEditProb);
       }

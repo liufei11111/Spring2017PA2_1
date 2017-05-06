@@ -1,10 +1,12 @@
 package edu.stanford.cs276;
 
+import edu.stanford.cs276.util.Pair;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 
@@ -74,11 +76,18 @@ public class RunCorrector {
      */
     while ((query = queriesFileReader.readLine()) != null) {
 
-      String correctedQuery = query;
-      Map<Integer, HashSet<String>> candidateQuery = CandidateGenerator.get().getCandidates(query,languageModel,nsm);
+      Pair<String,Integer> correctedQuery = new Pair(query,0);
+      Map<String, HashSet<String>> candidateQuery = CandidateGenerator.get().getCandidates(query,languageModel,nsm);
       QueryPicker picker = new QueryPicker();
       //TODO funciton signiture match
-//      correctedQuery = picker.getBestQuery(candidateQuery,languageModel,nsm,CandidateGenerator.get(),query);
+      Set<Pair<String,String>> candSet = new HashSet<>();
+      for (Entry<String, HashSet<String>> entry: candidateQuery.entrySet()){
+        for(String cand: entry.getValue()){
+          candSet.add(new Pair<>(cand,entry.getKey()));
+        }
+
+      }
+      correctedQuery = picker.getBestQuery(candSet,languageModel,nsm,CandidateGenerator.get(),query,null);
       /*
        * Your code here: currently the correctQuery and original query are the same
        * Complete this implementation so that the spell corrector corrects the 

@@ -127,7 +127,7 @@ public class QueryPicker {
         if (candSetPerQuery.length() == 0 || goldQuery.length() == 0) {
           break;
         }
-        Set<Pair<String, Integer>> canset = new HashSet<>();
+        Set<Pair<String, String>> canset = new HashSet<>();
         if (candSetPerQuery.contains(";")) {
           String[] firstParse = candSetPerQuery.split(";");
           originalQuery = firstParse[0];
@@ -136,20 +136,20 @@ public class QueryPicker {
 
             for (int k = 0; k < secondParse.length; ++k) {
               String[] pair = secondParse[k].split("-");
-              canset.add(new Pair<>(pair[0], Integer.parseInt(pair[1])));
+              canset.add(new Pair(pair[0], pair[1]));
             }
 
           } else {
             String[] secondParse = firstParse[1].split("-");
-            canset.add(new Pair<>(secondParse[0], Integer.parseInt(secondParse[1])));
+            canset.add(new Pair(secondParse[0], secondParse[1]));
           }
 
         }else{
           originalQuery = candSetPerQuery;
         }
-        canset.add(new Pair<>(candSetPerQuery,0));
+//        canset.add(new Pair<candSetPerQuery,));
 
-        String chosen = qp.getBestQuery(canset, languageModel,
+        Pair<String,Integer> chosen = qp.getBestQuery(canset, languageModel,
             nsm, CandidateGenerator.get(), originalQuery,compareProbFile);
         if (!goldQuery.equals(chosen)) {
           compareFile
@@ -175,13 +175,13 @@ public static void generateTestFiles(String goldFilePath, String querFile,
   StringBuilder sb = new StringBuilder();
   while(((goldQuery = goldFileReader.readLine()) != null)&&(inputQuery = queriesFileReader.readLine()) != null){
 
-    Map<Integer,HashSet<String>> candSet = CandidateGenerator.get().getCandidates(inputQuery,languageModel,nsm);
+    Map<String, HashSet<String>>candSet = CandidateGenerator.get().getCandidates(inputQuery,languageModel,nsm);
     sb.setLength(0);
 
 
     sb.append(inputQuery+";");
 
-    for (Entry<Integer,HashSet<String>> entry:candSet.entrySet()){
+    for (Entry<String,HashSet<String>> entry:candSet.entrySet()){
       for (String str: entry.getValue()){
         sb.append(str);
         sb.append("-");
@@ -197,12 +197,13 @@ public static void generateTestFiles(String goldFilePath, String querFile,
   }
       candidateSetFile.close();
 }
-  public String getBestQuery(Set<Pair<String,Integer>> candSet, LanguageModel languageModel,
+  public Pair<String,Integer> getBestQuery(Set<Pair<String,String>> candSet, LanguageModel languageModel,
       NoisyChannelModel nsm, CandidateGenerator canG, String original, FileWriter testInfoWriter) throws Exception {
     Pair<String,Double> bestCand = null;
+    Pair<String,Integer> testOutput = null;
     StringBuffer candidateBuffer = new StringBuffer();
     candidateBuffer.append(original+"$");
-    for (Pair<String,Integer> str : candSet){
+    for (Pair<String,String> str : candSet){
       String[] terms = str.getFirst().split(" " );
       double noisyScore = nsm.getEditCostModel().editProbability(original,str.getFirst(),str.getSecond());
       double languageScore = languageModel.genLanguageScore(terms);
@@ -210,9 +211,12 @@ public static void generateTestFiles(String goldFilePath, String querFile,
       candidateBuffer.append(str+":: <"+languageScore+","+noisyScore+","+candScore+">|");
       if (bestCand == null){
         bestCand = new Pair<>(str.getFirst(),candScore);
+        testOutput = new Pair(str.getFirst(),(int)(str.getSecond().charAt(0)-'0'));
       }else if (candScore > bestCand.getSecond()){
         bestCand.setFirst(str.getFirst());
         bestCand.setSecond(candScore);
+        testOutput.setFirst(str.getFirst());
+        testOutput.setSecond((int)(str.getSecond().charAt(0)-'0'));
       }
 
     }
@@ -220,6 +224,6 @@ public static void generateTestFiles(String goldFilePath, String querFile,
       testInfoWriter.write(candidateBuffer.toString()+"\n");
     }
 
-    return bestCand.getFirst();
+    return testOutput;
   }
 }

@@ -100,10 +100,19 @@ public class QueryPicker {
 
     Config.languageModelScalingFactor = (j+1)*0.2 / jSize ;
 //    Config.singleEditProb = (i+1)*0.1 /iSize;
+    String indexI = ""+i;
+    String indexJ = ""+j;
+
+      for (int m=0;m<5-indexI.length();++m){
+        indexI="0"+indexI;
+      }
+    for (int m=0;m<5-indexJ.length();++m){
+      indexJ="0"+indexJ;
+    }
     FileWriter compareFile = new FileWriter(
-        new File("test_result/Cand_gold_diff_" + i + "_" + j + "_" + ".txt"));
+        new File("test_result/Cand_gold_diff_" + indexI + "_" +  indexJ + "_" + ".txt"));
     FileWriter compareProbFile = new FileWriter(
-        new File("test_result/Cand_gold_diff_Prob_" + i + "_" + j + "_" + ".txt"));
+        new File("test_result/Cand_gold_diff_Prob_" + indexI + "_" + indexJ + "_" + ".txt"));
 
     BufferedReader brCanSet = new BufferedReader(new FileReader(new File("Cand_set.txt")));
     QueryPicker qp = new QueryPicker();

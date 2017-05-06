@@ -67,20 +67,24 @@ public class QueryPicker {
     NoisyChannelModel nsm = NoisyChannelModel.load();
     BufferedReader queriesFileReader = new BufferedReader(new FileReader(new File(queryFilePath)));
     nsm.setProbabilityType(uniformOrEmpirical);
+
 //    generateTestFiles( goldFilePath, queryFilePath, languageModel, nsm);
+
     String query = null;
 
     String goldQuery = null;
     String inputQuery = null;
     String candSetPerQuery = null;
-    int languageModelScaleingFactorSpace = 100;
-    int bigramSmoothingFactor = 50;
+//    int languageModelScaleingFactorSpace = 100;
+//    int bigramSmoothingFactor = 50;
+    int languageModelScaleingFactorSpace = 1;
+    int bigramSmoothingFactor = 20;
     for (int i=0;i<languageModelScaleingFactorSpace;++i){
 
       for (int j=0;j<bigramSmoothingFactor;++j) {
         evaludateTestFile( languageModelScaleingFactorSpace,bigramSmoothingFactor, goldFilePath,  i,  j,  languageModel, nsm);
 //
-
+        System.out.println(i+" out of "+languageModelScaleingFactorSpace+", "+j+" out of "+bigramSmoothingFactor +" is done.");
       }
     }
   }
@@ -90,17 +94,19 @@ public class QueryPicker {
     if (goldFilePath != null) {
       goldFileReader = new BufferedReader(new FileReader(new File(goldFilePath)));
     }
-        //  public static double languageModelScalingFactor = 0.99;
-//        public static double smoothingFactor=0.1;
+
     Config.smoothingFactor = j*1.0 / jSize * (i + 1);
-    Config.languageModelScalingFactor = i*4.0 /iSize* (j + 1);
+//    Config.languageModelScalingFactor = i*4.0 /iSize* (j + 1);
     FileWriter compareFile = new FileWriter(
         new File("test_result/Cand_gold_diff_" + i + "_" + j + "_" + ".txt"));
+    FileWriter compareProbFile = new FileWriter(
+        new File("test_result/Cand_gold_diff_Prob_" + i + "_" + j + "_" + ".txt"));
 
     BufferedReader brCanSet = new BufferedReader(new FileReader(new File("Cand_set.txt")));
     QueryPicker qp = new QueryPicker();
     String goldQuery = null;
     String candSetPerQuery = null;
+    String originalQuery = null;
     try {
       while (((goldQuery = goldFileReader.readLine()) != null)
           && (candSetPerQuery = brCanSet.readLine()) != null) {
@@ -108,22 +114,14 @@ public class QueryPicker {
           break;
         }
         Set<Pair<String, Integer>> canset = new HashSet<>();
-        String originalQuery = null;
-//        System.out.println(
-//            "****DEBUG*****goldQuery:" + goldQuery + "\n Candidate query: " + candSetPerQuery
-//                + "\n");
         if (candSetPerQuery.contains(";")) {
           String[] firstParse = candSetPerQuery.split(";");
+          originalQuery = firstParse[0];
           if (firstParse[1].contains("%")) {
-//            System.out.println("FirstParse: " + firstParse[0]);
             String[] secondParse = firstParse[1].split("%");
-//            System.out.println("Second" + secondParse[1]);
-            //              if ()
 
             for (int k = 0; k < secondParse.length; ++k) {
               String[] pair = secondParse[k].split("-");
-//              System.out.println(secondParse[k]);
-//              System.out.println(" Third " + pair[1]);
               canset.add(new Pair<>(pair[0], Integer.parseInt(pair[1])));
             }
 
@@ -131,17 +129,18 @@ public class QueryPicker {
             String[] secondParse = firstParse[1].split("-");
             canset.add(new Pair<>(secondParse[0], Integer.parseInt(secondParse[1])));
           }
-          //
-          //          }else{
-          String chosen = qp.getBestQuery(canset, languageModel,
-              nsm, CandidateGenerator.get(), firstParse[0]);
-          if (!chosen.equals(goldQuery)) {
-            compareFile
-                .write("Chosen: " + ", Gold: " + goldQuery + ", Original: " + firstParse[0]);
-          }
-          //            continue;
+
+        }else{
+          originalQuery = candSetPerQuery;
         }
-        canset.add(new Pair<>(candSetPerQuery, 0));
+        canset.add(new Pair<>(candSetPerQuery,0));
+
+        String chosen = qp.getBestQuery(canset, languageModel,
+            nsm, CandidateGenerator.get(), originalQuery,compareProbFile);
+        if (!goldQuery.equals(chosen)) {
+          compareFile
+              .write("Chosen: " + chosen+", Gold: " + goldQuery + ", Original: " + originalQuery+"\n");
+        }
 
 
       }
@@ -149,6 +148,7 @@ public class QueryPicker {
       e.printStackTrace();
     }
     goldFileReader.close();
+    compareProbFile.close();
     brCanSet.close();
   }
 public static void generateTestFiles(String goldFilePath, String querFile,
@@ -168,25 +168,15 @@ public static void generateTestFiles(String goldFilePath, String querFile,
     sb.append(inputQuery+";");
 
     for (Entry<Integer,HashSet<String>> entry:candSet.entrySet()){
-//      int i=0;
       for (String str: entry.getValue()){
         sb.append(str);
         sb.append("-");
         sb.append(entry.getKey());
-//        if (i<entry.getValue().size()){
           sb.append("%");
-//          i++;
-//        }
       }
-//      sb.append(System.lineSeparator());
-//      System.out.println(goldQuery);
-//      Thread.sleep(1000);
-
-//      System.out.print(sb.toString());
     }
 
     sb.setLength(sb.length()-1);
-//    sb.append(";"+goldQuery)
     candidateSetFile.write(sb.toString());
 
     candidateSetFile.write(System.lineSeparator());
@@ -194,13 +184,16 @@ public static void generateTestFiles(String goldFilePath, String querFile,
       candidateSetFile.close();
 }
   public String getBestQuery(Set<Pair<String,Integer>> candSet, LanguageModel languageModel,
-      NoisyChannelModel nsm, CandidateGenerator canG, String original) throws Exception {
+      NoisyChannelModel nsm, CandidateGenerator canG, String original, FileWriter testInfoWriter) throws Exception {
     Pair<String,Double> bestCand = null;
+    StringBuffer candidateBuffer = new StringBuffer();
+    candidateBuffer.append(original+"$");
     for (Pair<String,Integer> str : candSet){
       String[] terms = str.getFirst().split(" " );
       double noisyScore = nsm.getEditCostModel().editProbability(original,str.getFirst(),str.getSecond());
       double languageScore = languageModel.genLanguageScore(terms);
       double candScore = noisyScore+Config.languageModelScalingFactor * languageScore;
+      candidateBuffer.append(str+":: <"+languageScore+","+noisyScore+","+candScore+">|");
       if (bestCand == null){
         bestCand = new Pair<>(str.getFirst(),candScore);
       }else if (candScore > bestCand.getSecond()){
@@ -209,51 +202,7 @@ public static void generateTestFiles(String goldFilePath, String querFile,
       }
 
     }
+    testInfoWriter.write(candidateBuffer.toString()+"\n");
     return bestCand.getFirst();
   }
-
-//  public Pair<String,double[]> getCorrectedQuery(String original, Map<String,Pair<Double,Integer>> queries,NoisyChannelModel ncm, LanguageModel lm) {
-//    Pair<String, double[]> thePair = null;
-//    for (Entry<String,Pair<Double, Integer>> query: queries.entrySet()){
-//      // everything is already log transformed
-////      double noisyScore = ncm.getEditCostModel().editProbability(original,query.getKey(),query.getValue().getSecond());
-////      double languageScore = query.getValue().getFirst();
-////      double candScore = noisyScore+Config.languageModelScalingFactor * languageScore;
-////
-////      if (thePair == null){
-////        thePair = new Pair<>(query.getKey(),candScore);
-////      }else if (thePair.getSecond()<candScore){
-////        thePair = new Pair<>(query.getKey(),candScore);
-////      }
-//      double noisyScore = ncm.getEditCostModel().editProbability(original,query.getKey(),query.getValue().getSecond());
-//      double languageScore = query.getValue().getFirst();
-//      double candScore = noisyScore+Config.languageModelScalingFactor * languageScore;
-//      double[] scores = new double[3];
-//      scores[0]=noisyScore;
-//      scores[1]=languageScore;
-//      scores[2]=candScore;
-//      if (thePair == null){
-//        thePair = new Pair<>(query.getKey(),scores);
-//      }else if (thePair.getSecond()[2]<candScore){
-//        thePair = new Pair<>(query.getKey(),scores);
-//      }
-//    }
-//    if (thePair == null){
-//      throw new RuntimeException("Forbidden query cands without a single result!");
-//    }
-//    // TODO: delete this test section!!!!!
-//    List<Entry<String,Pair<Double,Integer>>> list = new ArrayList<>();
-//    Collections.sort(list, new Comparator<Entry<String, Pair<Double, Integer>>>() {
-//      @Override
-//      public int compare(Entry<String, Pair<Double, Integer>> o1,
-//          Entry<String, Pair<Double, Integer>> o2) {
-//        return o1.getValue().getFirst().compareTo(o2.getValue().getFirst());
-//      }
-//    });
-//    for (Entry<String,Pair<Double,Integer>> entry : list){
-//      System.out.println(entry.getKey()+": "+entry.getValue());
-//    }
-//    // TODO: delete this test section!!!!!
-//    return thePair;
-//  }
 }

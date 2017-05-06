@@ -13,9 +13,6 @@ public class Dictionary implements Serializable {
   public int termCount;
   public Map<String, Integer> unigram;
   public Map<Pair<String,String>, Integer> bigram;
-  public int termCount() {
-    return termCount;
-  }
 
   public Dictionary() {
     termCount = 0;

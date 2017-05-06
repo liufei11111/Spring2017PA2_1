@@ -9,14 +9,10 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.RandomAccessFile;
 import java.io.Serializable;
 
 import edu.stanford.cs276.util.Dictionary;
-import java.nio.ByteBuffer;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * LanguageModel class constructs a language model from the training corpus.
@@ -85,13 +81,13 @@ public class LanguageModel implements Serializable {
          * Remember: each line is a document (refer to PA2 handout)
          *
          */
-        line= line.replaceAll("_+"," ");
-        line = line.replaceAll("\\s+"," ");
+//        line= line.replaceAll("_+"," ");
+//        line = line.replaceAll("\\s+"," ");
         String[] tokens = line.trim().split(" ");
         for (int i=0;i<tokens.length;++i){
-          boolean foundNum = containsNumberOrTooLong(tokens[i]);
+          boolean foundNum = containsNumberTooShortOrTooLong(tokens[i]);
           if (foundNum){continue;}
-          if (i!=tokens.length-1&&!containsNumberOrTooLong(tokens[i+1])){
+          if (i!=tokens.length-1&&!containsNumberTooShortOrTooLong(tokens[i+1])){
             Pair<String,String> bigramPair = new Pair<>(tokens[i],tokens[i+1]);
             if (dict.bigram.containsKey(bigramPair)){
               dict.bigram.put(bigramPair, dict.bigram.get(bigramPair)+1);
@@ -105,7 +101,6 @@ public class LanguageModel implements Serializable {
           }else{
             dict.unigram.put(tokens[i],1);
           }
-          dict.termCount++;
         }
 
       }
@@ -175,8 +170,9 @@ public class LanguageModel implements Serializable {
     System.out.println("Done.");
   }
 
-  private boolean containsNumberOrTooLong(String str) {
-    if (str.length()>Config.wordThreshold){return true;}
+  private boolean containsNumberTooShortOrTooLong(String str) {
+    int len = str.length();
+    if (len>Config.wordThreshold||len==0){return true;}
     boolean foundNum = false;
     for (char aChar : str.toCharArray()){
       if (Character.isDigit(aChar)){
@@ -208,7 +204,7 @@ public class LanguageModel implements Serializable {
         ObjectInputStream oisA = new ObjectInputStream(fiA);
         lm_ = (LanguageModel) oisA.readObject();
         MapEncoder me = new MapEncoder();
-        Map<String, Integer> unigram = me.retrieveUnigram();
+        Map<String, Integer> unigram = me.retrieveUnigram(lm_);
         Map<Pair<String,String>,Integer> bigram = me.retrieveBigram();
         lm_.dict.unigram=unigram;
         lm_.dict.bigram=bigram;
@@ -252,11 +248,11 @@ public class LanguageModel implements Serializable {
   public double getConditionalProd(String term1, String term2) {
     double unigramScore = unigramProbForTerm(term2);
     if (term1 == null){
-      return unigramScore*2;
+      return unigramScore;
     }
     double termUnigram = rawCountForTerm(term1);
     double countBigram = rawBiCountForTerms(term1,term2);
-    double bigramScore = Math.log(countBigram)-Math.log(termUnigram+Config.eps);
+    double bigramScore = Math.log(countBigram+Config.eps)-Math.log(termUnigram+Config.eps);
     // we use bigram to decide which word is wrong. and we just need to log of count and total is constant and can be ignored
     return  unigramScore*Config.smoothingFactor+bigramScore*(1-Config.smoothingFactor);
   }
@@ -264,18 +260,18 @@ public class LanguageModel implements Serializable {
   private double rawBiCountForTerms(String term1, String term2) {
     Integer count = dict.bigram.get(new Pair<>(term1,term2));
     if (count == null){
-      return Math.log(Config.eps);
+      return 0.0;
     }else{
-      return Math.log(count)-Math.log(dict.termCount);
+      return count;
     }
   }
 
   private double rawCountForTerm(String term1) {
     Integer count = dict.unigram.get(term1);
     if (count == null){
-      return Math.log(Config.eps);
+      return 0.0;
     }else{
-      return Math.log(count)-Math.log(dict.termCount);
+      return count;
     }
   }
 
@@ -285,11 +281,10 @@ public class LanguageModel implements Serializable {
     for(int i=0;i<terms.length-1;++i){
       if (i==0) {
         // raw count is good as the total count is a constant
-        logLanguageScore += unigramProbForTerm(terms[i]);
+        logLanguageScore += getConditionalProd(null,terms[i]);
+      }else{
+        logLanguageScore+=getConditionalProd(terms[i],terms[i+1]);
       }
-
-      logLanguageScore+=getConditionalProd(terms[i],terms[i+1]);
-
     }
     return logLanguageScore;
   }

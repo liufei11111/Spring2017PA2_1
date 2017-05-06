@@ -1,17 +1,11 @@
 package edu.stanford.cs276;
 
-import edu.stanford.cs276.util.Pair;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import edu.stanford.cs276.util.Dictionary;
 
 public class CandidateGenerator implements Serializable {
@@ -45,31 +39,26 @@ public class CandidateGenerator implements Serializable {
       'u', 'v', 'w', 'x', 'y', 'z', ' ', '\'', '+'));
 
   public ArrayList<Integer> invalidCount(String query, Dictionary dict) {
-    String[] terms = query.split(" ");
+    ArrayList<Integer> result = new ArrayList<Integer>();
+    String[] terms = query.split(" ", -1);
     int invalidCount = 0;
-    int invalidIndex = 0;
     int index = 0;
     for (String term : terms) {
       if (dict.count(term) == 0) {
         invalidCount++;
-        if (invalidCount == 1) {
-          invalidIndex = index;
-        }
+        result.add(index);
       }
       index++;
     }
-    ArrayList<Integer> result = new ArrayList<Integer>();
-    result.add(invalidCount);
-    result.add(invalidIndex);
+    result.add(0, invalidCount);
     return result;
   }
 
-
-  public ArrayList<ArrayList<Pair<String,Integer>>> del1(String query, Dictionary dict, int useSpace) {
-    ArrayList<ArrayList<Pair<String,Integer>>> resultTuple = new ArrayList<ArrayList<Pair<String,Integer>>>();
-    ArrayList<Pair<String,Integer>> result0 = new ArrayList<Pair<String,Integer>>();
-    ArrayList<Pair<String,Integer>> result1 = new ArrayList<Pair<String,Integer>>();
-    ArrayList<Pair<String,Integer>> result2 = new ArrayList<Pair<String,Integer>>();
+  public ArrayList<ArrayList<String>> del1(String query, Dictionary dict, int useSpace, boolean isSimple) {
+    ArrayList<ArrayList<String>> resultTuple = new ArrayList<ArrayList<String>>();
+    ArrayList<String> result0 = new ArrayList<String>();
+    ArrayList<String> result1 = new ArrayList<String>();
+    ArrayList<String> result2 = new ArrayList<String>();
     int l = query.length();
     for (int i = 0; i < l; i++) {
       if (!alphabet.contains(query.charAt(i))) {
@@ -87,15 +76,19 @@ public class CandidateGenerator implements Serializable {
         }
       }
       String temp = query.substring(0, i) + query.substring(i + 1);
-      ArrayList<Integer> inCount = invalidCount(temp, dict);
-      if (inCount.get(0) == 0) {
-        result0.add(new Pair<String,Integer>(temp, 0));
-      }
-      if (inCount.get(0) == 1) {
-        result1.add(new Pair<String,Integer>(temp, inCount.get(1)));
-      }
-      if (inCount.get(0) == 2) {
-        result2.add(new Pair<String,Integer>(temp, inCount.get(1)));
+      if (!isSimple) {
+        ArrayList<Integer> inCount = invalidCount(temp, dict);
+        if (inCount.get(0) == 0) {
+          result0.add(temp);
+        }
+        if (inCount.get(0) == 1) {
+          result1.add(temp);
+        }
+        if (inCount.get(0) == 2) {
+          result2.add(temp);
+        }
+      } else {
+        result0.add(temp);
       }
     }
     resultTuple.add(result0);
@@ -104,11 +97,11 @@ public class CandidateGenerator implements Serializable {
     return resultTuple;
   }
 
-  public ArrayList<ArrayList<Pair<String,Integer>>> ins1(String query, Dictionary dict, int useSpace) {
-    ArrayList<ArrayList<Pair<String,Integer>>> resultTuple = new ArrayList<ArrayList<Pair<String,Integer>>>();
-    ArrayList<Pair<String,Integer>> result0 = new ArrayList<Pair<String,Integer>>();
-    ArrayList<Pair<String,Integer>> result1 = new ArrayList<Pair<String,Integer>>();
-    ArrayList<Pair<String,Integer>> result2 = new ArrayList<Pair<String,Integer>>();
+  public ArrayList<ArrayList<String>> ins1(String query, Dictionary dict, int useSpace, boolean isSimple) {
+    ArrayList<ArrayList<String>> resultTuple = new ArrayList<ArrayList<String>>();
+    ArrayList<String> result0 = new ArrayList<String>();
+    ArrayList<String> result1 = new ArrayList<String>();
+    ArrayList<String> result2 = new ArrayList<String>();
     int l = query.length();
     for (int i = 0; i <= l; i++) {
       for (char c : alphabet) {
@@ -124,15 +117,19 @@ public class CandidateGenerator implements Serializable {
           }
         }
         String temp = query.substring(0, i) + c + query.substring(i);
-        ArrayList<Integer> inCount = invalidCount(temp, dict);
-        if (inCount.get(0) == 0) {
-          result0.add(new Pair<String,Integer>(temp, 0));
-        }
-        if (inCount.get(0) == 1) {
-          result1.add(new Pair<String,Integer>(temp, inCount.get(1)));
-        }
-        if (inCount.get(0) == 2) {
-          result2.add(new Pair<String,Integer>(temp, inCount.get(1)));
+        if (!isSimple) {
+          ArrayList<Integer> inCount = invalidCount(temp, dict);
+          if (inCount.get(0) == 0) {
+            result0.add(temp);
+          }
+          if (inCount.get(0) == 1) {
+            result1.add(temp);
+          }
+          if (inCount.get(0) == 2) {
+            result2.add(temp);
+          }
+        } else {
+          result0.add(temp);
         }
       }
     }
@@ -142,17 +139,17 @@ public class CandidateGenerator implements Serializable {
     return resultTuple;
   }
 
-  public ArrayList<ArrayList<Pair<String,Integer>>> sub1(String query, Dictionary dict, int useSpace) {
-    ArrayList<ArrayList<Pair<String,Integer>>> resultTuple = new ArrayList<ArrayList<Pair<String,Integer>>>();
-    ArrayList<Pair<String,Integer>> result0 = new ArrayList<Pair<String,Integer>>();
-    ArrayList<Pair<String,Integer>> result1 = new ArrayList<Pair<String,Integer>>();
-    ArrayList<Pair<String,Integer>> result2 = new ArrayList<Pair<String,Integer>>();
+  public ArrayList<ArrayList<String>> sub1(String query, Dictionary dict, int useSpace, boolean isSimple) {
+    ArrayList<ArrayList<String>> resultTuple = new ArrayList<ArrayList<String>>();
+    ArrayList<String> result0 = new ArrayList<String>();
+    ArrayList<String> result1 = new ArrayList<String>();
+    ArrayList<String> result2 = new ArrayList<String>();
     int l = query.length();
     for (int i = 0; i < l; i++) {
       if (!alphabet.contains(query.charAt(i))) {
         continue;
       }
-      int nonSpace = 0;
+      int nonSpace1 = 0;
       if (useSpace < 2) {
         if (useSpace == 0) {
           if (query.charAt(i) == ' ') {
@@ -160,11 +157,12 @@ public class CandidateGenerator implements Serializable {
           }
         } else {
           if (query.charAt(i) != ' ') {
-            nonSpace++;
+            nonSpace1++;
           }
         }
       }
       for (char c : alphabet) {
+        int nonSpace2 = 0;
         if (useSpace < 2) {
           if (useSpace == 0) {
             if (c == ' ') {
@@ -172,23 +170,30 @@ public class CandidateGenerator implements Serializable {
             }
           } else {
             if (c != ' ') {
-              nonSpace++;
+              nonSpace2++;
+            }
+            if (nonSpace1 + nonSpace2 == 2) {
+              continue;
             }
           }
-          if (nonSpace == 2) {
-            continue;
-          }
+        }
+        if (c == query.charAt(i)) {
+          continue;
         }
         String temp = query.substring(0, i) + c + query.substring(i + 1);
-        ArrayList<Integer> inCount = invalidCount(temp, dict);
-        if (inCount.get(0) == 0) {
-          result0.add(new Pair<String,Integer>(temp, 0));
-        }
-        if (inCount.get(0) == 1) {
-          result1.add(new Pair<String,Integer>(temp, inCount.get(1)));
-        }
-        if (inCount.get(0) == 2) {
-          result2.add(new Pair<String,Integer>(temp, inCount.get(1)));
+        if (!isSimple) {
+          ArrayList<Integer> inCount = invalidCount(temp, dict);
+          if (inCount.get(0) == 0) {
+            result0.add(temp);
+          }
+          if (inCount.get(0) == 1) {
+            result1.add(temp);
+          }
+          if (inCount.get(0) == 2) {
+            result2.add(temp);
+          }
+        } else {
+          result0.add(temp);
         }
       }
     }
@@ -198,11 +203,11 @@ public class CandidateGenerator implements Serializable {
     return resultTuple;
   }
 
-  public ArrayList<ArrayList<Pair<String,Integer>>> trans1(String query, Dictionary dict, int useSpace) {
-    ArrayList<ArrayList<Pair<String,Integer>>> resultTuple = new ArrayList<ArrayList<Pair<String,Integer>>>();
-    ArrayList<Pair<String,Integer>> result0 = new ArrayList<Pair<String,Integer>>();
-    ArrayList<Pair<String,Integer>> result1 = new ArrayList<Pair<String,Integer>>();
-    ArrayList<Pair<String,Integer>> result2 = new ArrayList<Pair<String,Integer>>();
+  public ArrayList<ArrayList<String>> trans1(String query, Dictionary dict, int useSpace, boolean isSimple) {
+    ArrayList<ArrayList<String>> resultTuple = new ArrayList<ArrayList<String>>();
+    ArrayList<String> result0 = new ArrayList<String>();
+    ArrayList<String> result1 = new ArrayList<String>();
+    ArrayList<String> result2 = new ArrayList<String>();
     int l = query.length();
     for (int i = 0; i < l - 1; i++) {
       if (!alphabet.contains(query.charAt(i)) || !alphabet.contains(query.charAt(i + 1))) {
@@ -210,7 +215,7 @@ public class CandidateGenerator implements Serializable {
       }
       if (useSpace < 2) {
         if (useSpace == 1) {
-          if ((query.charAt(i) != ' ' && query.charAt(i + 1) == ' ')) {
+          if ((query.charAt(i) != ' ' && query.charAt(i + 1) != ' ')) {
             continue;
           }
         } else {
@@ -220,15 +225,19 @@ public class CandidateGenerator implements Serializable {
         }
       }
       String temp = query.substring(0, i) + query.charAt(i + 1) + query.charAt(i) + query.substring(i + 2);
-      ArrayList<Integer> inCount = invalidCount(temp, dict);
-      if (inCount.get(0) == 0) {
-        result0.add(new Pair<String,Integer>(temp, 0));
-      }
-      if (inCount.get(0) == 1) {
-        result1.add(new Pair<String,Integer>(temp, inCount.get(1)));
-      }
-      if (inCount.get(0) == 2) {
-        result2.add(new Pair<String,Integer>(temp, inCount.get(1)));
+      if (!isSimple) {
+        ArrayList<Integer> inCount = invalidCount(temp, dict);
+        if (inCount.get(0) == 0) {
+          result0.add(temp);
+        }
+        if (inCount.get(0) == 1) {
+          result1.add(temp);
+        }
+        if (inCount.get(0) == 2) {
+          result2.add(temp);
+        }
+      } else {
+        result0.add(temp);
       }
     }
     resultTuple.add(result0);
@@ -237,208 +246,278 @@ public class CandidateGenerator implements Serializable {
     return resultTuple;
   }
 
-  public void move1AddCandidate(String query, HashSet<String> candidates, Dictionary dict, int useSpace) {
-    ArrayList<ArrayList<Pair<String,Integer>>> queryDel1 = del1(query, dict, useSpace);
-    for (Pair<String,Integer> pair : queryDel1.get(0)) {
-      candidates.add(pair.getFirst());
-    }
-    ArrayList<ArrayList<Pair<String,Integer>>> queryIns1 = ins1(query, dict, useSpace);
-    for (Pair<String,Integer> pair : queryIns1.get(0)) {
-      candidates.add(pair.getFirst());
-    }
-    ArrayList<ArrayList<Pair<String,Integer>>> querySub1 = sub1(query, dict, useSpace);
-    for (Pair<String,Integer> pair : querySub1.get(0)) {
-      candidates.add(pair.getFirst());
-    }
-    ArrayList<ArrayList<Pair<String,Integer>>> queryTrans1 = trans1(query, dict, useSpace);
-    for (Pair<String,Integer> pair : queryTrans1.get(0)) {
-      candidates.add(pair.getFirst());
+  public void move1AddCandidate(String query, HashMap<Integer, HashSet<String>> candidates, Dictionary dict, int useSpace, int reIndex) {
+    ArrayList<ArrayList<String>> queryDel1 = del1(query, dict, useSpace, false);
+    ArrayList<ArrayList<String>> queryIns1 = ins1(query, dict, useSpace, false);
+    ArrayList<ArrayList<String>> querySub1 = sub1(query, dict, useSpace, false);
+    ArrayList<ArrayList<String>> queryTrans1 = trans1(query, dict, useSpace, false);
+    for (int i = 0; i <= reIndex; i++) {
+      for (String qp : queryTrans1.get(i)) {
+        candidates.get(i).add(qp);
+      }
+      for (String qp : queryDel1.get(i)) {
+        candidates.get(i).add(qp);
+      }
+      for (String qp : queryIns1.get(i)) {
+        candidates.get(i).add(qp);
+      }
+      for (String qp : querySub1.get(i)) {
+        candidates.get(i).add(qp);
+      }
     }
   }
 
-  public void error1Move1AddCandidate(String query, HashSet<String> candidates, Dictionary dict, int index) {
-    String[] terms = query.split(" ");
-    String tempQuery = terms[index];
-    HashSet<String> tempCandidates = new HashSet<String>();
-    move1AddCandidate(tempQuery, tempCandidates, dict, 0);
-    StringBuilder sb = new StringBuilder();
-    int count = 0;
-    for (String t : tempCandidates) {
-      terms[index] = t;
-      sb.append(t);
-      if (count!=index){
-        count++;
-        sb.append(" ");
+  public void operateOnce(String query, ArrayList<Integer> parseResult, Dictionary dict, HashSet<String> candidate) {
+    int errorNum = parseResult.get(0);
+    String[] terms = query.split(" ", -1);
+    if (errorNum == 1) {
+      int errorIndex = parseResult.get(1);
+      String tempQuery = terms[errorIndex];
+      HashMap<Integer, HashSet<String>> tempCandidates = new HashMap<Integer, HashSet<String>>();
+      tempCandidates.put(0, new HashSet<String>());
+      move1AddCandidate(tempQuery, tempCandidates, dict, 0, 0);
+      String oldTerm = terms[errorIndex];
+      for (String t : tempCandidates.get(0)) {
+        terms[errorIndex] = t;
+        candidate.add(joinStrings(terms));
+        terms[errorIndex] = oldTerm;
       }
-      candidates.add(sb.toString());
+    } else {
+      for (int i = 0; i < terms.length; i++) {
+        String tempQuery = terms[i];
+        HashMap<Integer, HashSet<String>> tempCandidates = new HashMap<Integer, HashSet<String>>();
+        tempCandidates.put(0, new HashSet<String>());
+        move1AddCandidate(tempQuery, tempCandidates, dict, 0, 0);
+        String oldTerm = terms[i];
+        for (String t : tempCandidates.get(0)) {
+          terms[i] = t;
+          candidate.add(joinStrings(terms));
+          terms[i] = oldTerm;
+        }
+      }
     }
   }
 
-  public void error2Move1AddCandidate(String query, HashSet<String> candidates, Dictionary dict, int index) {
-    String[] terms = query.split(" ");
-    String original = terms[index];
-    String original2 = terms[index + 1];
-    terms[index] = original + original2;
-    terms[index + 1] = "";
-    String a = "";
-    boolean firstTry = true;
-    for (String term : terms) {
-      if (term.isEmpty()) {
-        continue;
+  public void operateTwice(String query, ArrayList<Integer> parseResult, Dictionary dict, HashSet<String> candidate) {
+    int errorNum = parseResult.get(0);
+    String[] terms = query.split(" ", -1);
+    if (errorNum == 2) {
+      int errorIndex1 = parseResult.get(1);
+      int errorIndex2 = parseResult.get(2);
+      String tempQuery1 = terms[errorIndex1];
+      String tempQuery2 = terms[errorIndex2];
+      HashMap<Integer, HashSet<String>> tempCandidates1 = new HashMap<Integer, HashSet<String>>();
+      tempCandidates1.put(0,  new HashSet<String>());
+      HashMap<Integer, HashSet<String>> tempCandidates2 = new HashMap<Integer, HashSet<String>>();
+      tempCandidates2.put(0,  new HashSet<String>());
+      move1AddCandidate(tempQuery1, tempCandidates1, dict, 0, 0);
+      move1AddCandidate(tempQuery2, tempCandidates2, dict, 0, 0);
+      String oldTerm1 = terms[errorIndex1];
+      String oldTerm2 = terms[errorIndex2];
+      for (String t : tempCandidates1.get(0)) {
+        for (String q : tempCandidates2.get(0)) {
+          terms[errorIndex1] = t;
+          terms[errorIndex2] = q;
+          candidate.add(joinStrings(terms));
+          terms[errorIndex1] = oldTerm1;
+          terms[errorIndex2] = oldTerm2;
+        }
       }
-      if (!firstTry) {
-        a = a + " " + term;
+    } else if (errorNum == 1) {
+      int errorIndex1 = parseResult.get(1);
+      String tempQuery1 = terms[errorIndex1];
+      HashMap<Integer, HashSet<String>> tempCandidates1 = new HashMap<Integer, HashSet<String>>();
+      tempCandidates1.put(0, new HashSet<String>());
+      tempCandidates1.put(1, new HashSet<String>());
+      move1AddCandidate(tempQuery1, tempCandidates1, dict, 0, 1);
+      for (int i = 0; i < terms.length; i++) {
+        if (i == errorIndex1) {
+          HashMap<Integer, HashSet<String>> tempCandidates11 = new HashMap<Integer, HashSet<String>>();
+          tempCandidates11.put(0, new HashSet<String>());
+          for (String t1 : tempCandidates1.get(0)) {
+            move1AddCandidate(t1, tempCandidates11, dict, 0, 0);
+          }
+          for (String t1 : tempCandidates1.get(1)) {
+            move1AddCandidate(t1, tempCandidates11, dict, 0, 0);
+          }
+          String oldTerm1 = terms[errorIndex1];
+          for (String t : tempCandidates11.get(0)) {
+            terms[errorIndex1] = t;
+            candidate.add(joinStrings(terms));
+            terms[errorIndex1] = oldTerm1;
+          }
+        } else {
+          String tempQuery2 = terms[i];
+          HashMap<Integer, HashSet<String>> tempCandidates2 = new HashMap<Integer, HashSet<String>>();
+          tempCandidates2.put(0, new HashSet<String>());
+          move1AddCandidate(tempQuery2, tempCandidates2, dict, 0, 0);
+          String oldTerm1 = terms[errorIndex1];
+          String oldTerm2 = terms[i];
+          for (String t : tempCandidates1.get(0)) {
+            for (String q : tempCandidates2.get(0)) {
+              terms[errorIndex1] = t;
+              terms[i] = q;
+              candidate.add(joinStrings(terms));
+              terms[errorIndex1] = oldTerm1;
+              terms[i] = oldTerm2;
+            }
+          }
+        }
       }
-      firstTry = false;
+    } else {
+      for (int i = 0; i < terms.length; i++) {
+        for (int j = i; j < terms.length; j++) {
+          if (i != j) {
+            String tempQuery1 = terms[i];
+            String tempQuery2 = terms[j];
+            HashMap<Integer, HashSet<String>> tempCandidates1 = new HashMap<Integer, HashSet<String>>();
+            tempCandidates1.put(0, new HashSet<String>());
+            move1AddCandidate(tempQuery1, tempCandidates1, dict, 0, 0);
+            HashMap<Integer, HashSet<String>> tempCandidates2 = new HashMap<Integer, HashSet<String>>();
+            tempCandidates2.put(0, new HashSet<String>());
+            move1AddCandidate(tempQuery2, tempCandidates2, dict, 0, 0);
+            String oldTerm1 = terms[i];
+            String oldTerm2 = terms[j];
+            for (String t : tempCandidates1.get(0)) {
+              for (String q : tempCandidates2.get(0)) {
+                terms[i] = t;
+                terms[j] = q;
+                candidate.add(joinStrings(terms));
+                terms[i] = oldTerm1;
+                terms[j] = oldTerm2;
+              }
+            }
+          } else {
+            String tempQuery1 = terms[i];
+            HashMap<Integer, HashSet<String>> tempCandidates1 = new HashMap<Integer, HashSet<String>>();
+            tempCandidates1.put(0, new HashSet<String>());
+            tempCandidates1.put(1, new HashSet<String>());
+            move1AddCandidate(tempQuery1, tempCandidates1, dict, 0, 1);
+            HashMap<Integer, HashSet<String>> tempCandidates11 = new HashMap<Integer, HashSet<String>>();
+            tempCandidates11.put(0, new HashSet<String>());
+            for (String t1 : tempCandidates1.get(0)) {
+              move1AddCandidate(t1, tempCandidates11, dict, 0, 0);
+            }
+            for (String t1 : tempCandidates1.get(1)) {
+              move1AddCandidate(t1, tempCandidates11, dict, 0, 0);
+            }
+            String oldTerm1 = terms[i];
+            for (String t : tempCandidates11.get(0)) {
+              terms[i] = t;
+              candidate.add(joinStrings(terms));
+              terms[i] = oldTerm1;
+            }
+          }
+        }
+      }
     }
-    if (invalidCount(a, dict).get(0) == 0) {
-      candidates.add(a);
+  }
+
+  HashSet<String> space1(String query, Dictionary dict) {
+    HashSet<String> tempQueries = new HashSet<String>();
+    ArrayList<ArrayList<String>> queryDel1 = del1(query, dict, 1, true);
+    for (String qp : queryDel1.get(0)) {
+      tempQueries.add(qp);
     }
-    for (char c : alphabet) {
-      if (c == ' ') {
-        continue;
-      }
-      terms[index] = original + c + original2;
-      terms[index + 1] = "";
-      a = "";
-      for (String term : terms) {
-        if (term.isEmpty()) {
-          continue;
-        }
-        if (!firstTry) {
-          a = a + " " + term;
-        }
-        firstTry = false;
-      }
-      if (invalidCount(a, dict).get(0) == 0) {
-        candidates.add(a);
-      }
+    ArrayList<ArrayList<String>> queryIns1 = ins1(query, dict, 1, true);
+    for (String qp : queryIns1.get(0)) {
+      tempQueries.add(qp);
     }
-    if (!original2.isEmpty()) {
-      terms[index] = original + original2.charAt(0);
-      terms[index + 1] = original2.substring(1);
-      a = "";
-      for (String term : terms) {
-        if (term.isEmpty()) {
-          continue;
-        }
-        if (!firstTry) {
-          a = a + " " + term;
-        }
-        firstTry = false;
-      }
-      if (invalidCount(a, dict).get(0) == 0) {
-        candidates.add(a);
-      }
+    ArrayList<ArrayList<String>> querySub1 = sub1(query, dict, 1, true);
+    for (String qp : querySub1.get(0)) {
+      tempQueries.add(qp);
     }
-    if (!original.isEmpty()) {
-      terms[index] = original.substring(0, original.length() - 1);
-      terms[index + 1] = original.charAt(original.length() - 1) + original2;
-      a = "";
-      for (String term : terms) {
-        if (term.isEmpty()) {
-          continue;
-        }
-        if (!firstTry) {
-          a = a + " " + term;
-        }
-        firstTry = false;
+    ArrayList<ArrayList<String>> queryTrans1 = trans1(query, dict, 1, true);
+    for (String qp : queryTrans1.get(0)) {
+      tempQueries.add(qp);
+    }
+    return tempQueries;
+  }
+
+  HashSet<String> space2(HashSet<String> queries, Dictionary dict) {
+    HashSet<String> tempQueries = new HashSet<String>();
+    for (String query : queries) {
+      ArrayList<ArrayList<String>> queryDel1 = del1(query, dict, 1, true);
+      for (String qp : queryDel1.get(0)) {
+        tempQueries.add(qp);
       }
-      if (invalidCount(a, dict).get(0) == 0) {
-        candidates.add(a);
+      ArrayList<ArrayList<String>> queryIns1 = ins1(query, dict, 1, true);
+      for (String qp : queryIns1.get(0)) {
+        tempQueries.add(qp);
+      }
+      ArrayList<ArrayList<String>> querySub1 = sub1(query, dict, 1, true);
+      for (String qp : querySub1.get(0)) {
+        tempQueries.add(qp);
+      }
+      ArrayList<ArrayList<String>> queryTrans1 = trans1(query, dict, 1, true);
+      for (String qp : queryTrans1.get(0)) {
+        tempQueries.add(qp);
       }
     }
+    return tempQueries;
   }
 
   // Generate all candidates for the target query
   public Map<Integer, HashSet<String>> getCandidates(String query, LanguageModel languageModel,
       NoisyChannelModel nsm) throws Exception {
+    //query = "conference lina khatib larry dimon assoc prof sean";
+    //query = "case of chained messages theon";
+    /*query = "son to a";
+    String sos = "son o";*/
     Map<Integer, HashSet<String>> candidates = new HashMap<Integer, HashSet<String>>();
+    Dictionary dict = languageModel.dict;
     candidates.put(0, new HashSet<String>());
     candidates.put(1, new HashSet<String>());
     candidates.put(2, new HashSet<String>());
-    // distance = 0
-    Dictionary dict = languageModel.dict;
-    if (invalidCount(query, dict).get(0) == 0) {
-      candidates.get(0).add(query);
-    }
-    // distance = 1
-    ArrayList<ArrayList<Pair<String,Integer>>> queryDel1 = del1(query, dict, 2);
-    for (Pair<String,Integer> pair : queryDel1.get(0)) {
-      candidates.get(1).add(pair.getFirst());
-    }
-    ArrayList<ArrayList<Pair<String,Integer>>> queryIns1 = ins1(query, dict, 2);
-    for (Pair<String,Integer> pair : queryIns1.get(0)) {
-      candidates.get(1).add(pair.getFirst());
-    }
-    ArrayList<ArrayList<Pair<String,Integer>>> querySub1 = sub1(query, dict, 2);
-    for (Pair<String,Integer> pair : querySub1.get(0)) {
-      candidates.get(1).add(pair.getFirst());
-    }
-    ArrayList<ArrayList<Pair<String,Integer>>> queryTrans1 = trans1(query, dict, 2);
-    for (Pair<String,Integer> pair : queryTrans1.get(0)) {
-      candidates.get(1).add(pair.getFirst());
-    }
-
-    // distance = 2,
     // no space operation
-    for (Pair<String,Integer> pair : queryDel1.get(0)) {
-      move1AddCandidate(pair.getFirst(), candidates.get(2), dict, 2);
+    ArrayList<Integer> parseResult = invalidCount(query, dict);
+    if (parseResult.get(0) == 0) {
+      candidates.get(0).add(query);
+      operateOnce(query, parseResult, dict, candidates.get(1));
+      operateTwice(query, parseResult, dict, candidates.get(2));
     }
-    for (Pair<String,Integer> pair : queryDel1.get(1)) {
-      error1Move1AddCandidate(pair.getFirst(), candidates.get(2), dict, pair.getSecond());
+    if (parseResult.get(0) == 1) {
+      operateOnce(query, parseResult, dict, candidates.get(1));
+      operateTwice(query, parseResult, dict, candidates.get(2));
     }
-    for (Pair<String,Integer> pair : queryIns1.get(0)) {
-      move1AddCandidate(pair.getFirst(), candidates.get(2), dict, 2);
-    }
-    for (Pair<String,Integer> pair : queryIns1.get(1)) {
-      error1Move1AddCandidate(pair.getFirst(), candidates.get(2), dict, pair.getSecond());
-    }
-    for (Pair<String,Integer> pair : querySub1.get(0)) {
-      move1AddCandidate(pair.getFirst(), candidates.get(2), dict, 2);
-    }
-    for (Pair<String,Integer> pair : querySub1.get(1)) {
-      error1Move1AddCandidate(pair.getFirst(), candidates.get(2), dict, pair.getSecond());
-    }
-    for (Pair<String,Integer> pair : queryTrans1.get(0)) {
-      move1AddCandidate(pair.getFirst(), candidates.get(2), dict, 2);
-    }
-    for (Pair<String,Integer> pair : queryTrans1.get(1)) {
-      error1Move1AddCandidate(pair.getFirst(), candidates.get(2), dict, pair.getSecond());
+    if (parseResult.get(0) == 2) {
+      operateTwice(query, parseResult, dict, candidates.get(2));
     }
 
-    // space operation
-    for (Pair<String,Integer> pair : queryDel1.get(1)) {
-      move1AddCandidate(pair.getFirst(), candidates.get(2), dict, 1);
+    // space operation once
+    HashSet<String> querySpace1s = space1(query, dict);
+    for (String querySpace1 : querySpace1s) {
+      parseResult = invalidCount(querySpace1, dict);
+      if (parseResult.get(0) == 0) {
+        candidates.get(0).add(querySpace1);
+        operateOnce(querySpace1, parseResult, dict, candidates.get(1));
+      }
+      if (parseResult.get(0) == 1) {
+        operateOnce(querySpace1, parseResult, dict, candidates.get(1));
+      }
     }
-    for (Pair<String,Integer> pair : queryIns1.get(1)) {
-      move1AddCandidate(pair.getFirst(), candidates.get(2), dict, 1);
+
+    // space operation twice
+    HashSet<String> querySpace2s = space2(querySpace1s, dict);
+    for (String querySpace2 : querySpace2s) {
+      parseResult = invalidCount(querySpace2, dict);
+      if (parseResult.get(0) == 0) {
+        candidates.get(0).add(querySpace2);
+      }
     }
-    for (Pair<String,Integer> pair : querySub1.get(1)) {
-      move1AddCandidate(pair.getFirst(), candidates.get(2), dict, 1);
-    }
-    for (Pair<String,Integer> pair : queryTrans1.get(1)) {
-      move1AddCandidate(pair.getFirst(), candidates.get(2), dict, 1);
-    }
-    for (Pair<String,Integer> pair : queryDel1.get(2)) {
-      error2Move1AddCandidate(pair.getFirst(), candidates.get(2), dict, pair.getSecond());
-    }
-    for (Pair<String,Integer> pair : queryIns1.get(2)) {
-      error2Move1AddCandidate(pair.getFirst(), candidates.get(2), dict, pair.getSecond());
-    }
-    for (Pair<String,Integer> pair : querySub1.get(2)) {
-      error2Move1AddCandidate(pair.getFirst(), candidates.get(2), dict, pair.getSecond());
-    }
-    for (Pair<String,Integer> pair : queryTrans1.get(2)) {
-      error2Move1AddCandidate(pair.getFirst(), candidates.get(2), dict, pair.getSecond());
-    }
+
     coun++;
-    System.err.println(coun + " " + candidates.get(0).size()+" "+candidates.get(1).size()+" "+candidates.get(2).size());
-    
-    /*
-     * Your code here
-     */
+    System.err.println(coun + " " + (candidates.get(0).size() + candidates.get(1).size() + candidates.get(2).size()));
     return candidates;
   }
 
+  private String joinStrings(String[] strs){
+    if (strs==null || strs.length == 0){return null;}
+    StringBuilder sb = new StringBuilder();
+    for(String str: strs){
+      sb.append(str+" ");
+    }
+    sb.setLength(sb.length()-1);
+    return sb.toString();
+  }
 }

@@ -3,6 +3,7 @@ package edu.stanford.cs276.util;
 import static edu.stanford.cs276.Config.wordThreshold;
 
 import edu.stanford.cs276.Config;
+import edu.stanford.cs276.LanguageModel;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -35,15 +36,19 @@ public class MapEncoder {
     }
     fw.close();
   }
-  public  Map<String,Integer> retrieveUnigram()
+  public  Map<String,Integer> retrieveUnigram(LanguageModel lm)
       throws IOException {
     Map<String,Integer> map = new HashMap<>();
     BufferedReader br = new BufferedReader(new FileReader(new File(Config.unigramFile)));
     String line = null;
     while((line = br.readLine())!=null){
       String[] items = line.split(",");
-      map.put(items[1],Integer.parseInt(items[0]));
+      String key = items[1];
+      int num = Integer.parseInt(items[0]);
+      map.put(key,num);
+      lm.dict.termCount+=num;
     }
+    br.close();
     return map;
   }
   public void saveBigram( Map<Pair<String,String>,Integer> dict)

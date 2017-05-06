@@ -7,4 +7,7 @@ sudo docker run -it --rm -v /home/feiliu/workspace/cs276_hw1/Spring2017Hw1Sync/p
 time ./buildmodels.sh data/corpus data/training_set/edit1s.txt 
 
  time java -Xmx6024m -cp classes edu.stanford.cs276.QueryPicker uniform data/dev_set/queries.txt data/dev_set/gold.txt
- 
+
+ ls | grep -v Prob | sort | xargs -I {} bash -c "cat {} | wc -l"
+
+

@@ -77,10 +77,10 @@ public class QueryPicker {
     String goldQuery = null;
     String inputQuery = null;
 //    String candSetPerQuery = null;
-    int languageModelScaleingFactorSpace = 1;
+    int languageModelScaleingFactorSpace = 50;
 //    int smoothFactorSpace = 50;
 //    int languageModelScaleingFactorSpace = 1;
-    int smoothFactorSpace = 50;
+    int smoothFactorSpace = 1;
 //    int smoothFactorSpace = 80;
     for (int i=0;i<languageModelScaleingFactorSpace;++i){
 
@@ -98,8 +98,8 @@ public class QueryPicker {
       goldFileReader = new BufferedReader(new FileReader(new File(goldFilePath)));
     }
 
-//    Config.languageModelScalingFactor = (j+1)*1 / jSize ;
-    Config.smoothingFactor = (i+1)*1.0 /iSize;
+    Config.languageModelScalingFactor = (j+1)*1 / iSize ;
+//    Config.smoothingFactor = (i+1)*1.0 /jSize;
     String indexI = ""+i;
     String indexJ = ""+j;
     int curr = indexI.length();

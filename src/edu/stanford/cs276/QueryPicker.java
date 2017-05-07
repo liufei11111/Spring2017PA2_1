@@ -221,8 +221,8 @@ public static void generateTestFiles(String goldFilePath, String querFile,
 
     String bestCand = original;
     double bestScore = getScoreForOneQuery(nsm,languageModel,original,"0",original);
-    StringBuffer candidateBuffer = new StringBuffer();
-    candidateBuffer.append(original+"$");
+//    StringBuffer candidateBuffer = new StringBuffer();
+//    candidateBuffer.append(original+"$");
     for (Entry<String,HashSet<String>> entry : candSet.entrySet()){
       String editDisKey = entry.getKey();
       for (String str :entry.getValue()){
@@ -235,7 +235,7 @@ public static void generateTestFiles(String goldFilePath, String querFile,
       }
     }
     if (false){
-      testInfoWriter.write(candidateBuffer.toString()+"\n");
+//      testInfoWriter.write(candidateBuffer.toString()+"\n");
     }
 
     return bestCand;

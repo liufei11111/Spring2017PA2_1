@@ -21,13 +21,12 @@ import java.util.Map.Entry;
  * Created by feiliu on 5/4/17.
  */
 public class MapEncoder {
-  public void saveUnigram( Map<String,Integer> dict)
+  public void saveMapStringInteger(Map<String,Integer> dict, String fileName)
       throws IOException {
-//    RandomAccessFile rafUnigram = new RandomAccessFile(Config.unigramFile,"rw");
-    FileWriter fw = new FileWriter(Config.unigramFile);
+    FileWriter fw = new FileWriter(fileName);
     int count = 0;
     for (Entry<String, Integer> entry:dict.entrySet()){
-      fw.write(entry.getValue()+",");
+      fw.write(entry.getValue()+"`");
       fw.write(entry.getKey());
       if (count!=dict.size()-1){
         count++;
@@ -36,13 +35,34 @@ public class MapEncoder {
     }
     fw.close();
   }
+
+  public Map<String,Integer> retrieveMapStringInteger(String fileName)
+      throws IOException {
+    Map<String,Integer> map = new HashMap<>();
+    BufferedReader br = new BufferedReader(new FileReader(new File(fileName)));
+    String line = null;
+    while((line = br.readLine())!=null){
+      String[] items = line.split("`");
+      String key = items[1];
+      int num = Integer.parseInt(items[0]);
+      map.put(key,num);
+    }
+    br.close();
+    return map;
+  }
+
+  public void saveUnigram( Map<String,Integer> dict)
+      throws IOException {
+      saveMapStringInteger(dict, Config.unigramFile);
+  }
+
   public  Map<String,Integer> retrieveUnigram(LanguageModel lm)
       throws IOException {
     Map<String,Integer> map = new HashMap<>();
     BufferedReader br = new BufferedReader(new FileReader(new File(Config.unigramFile)));
     String line = null;
     while((line = br.readLine())!=null){
-      String[] items = line.split(",");
+      String[] items = line.split("`");
       String key = items[1];
       int num = Integer.parseInt(items[0]);
       map.put(key,num);
@@ -57,8 +77,8 @@ public class MapEncoder {
     FileWriter fw = new FileWriter(Config.bigramFile);
     int count = 0;
     for (Entry<Pair<String,String>, Integer> entry:dict.entrySet()){
-      fw.write(entry.getValue()+",");
-      fw.write(entry.getKey().getFirst()+",");
+      fw.write(entry.getValue()+"`");
+      fw.write(entry.getKey().getFirst()+"`");
       fw.write(entry.getKey().getSecond());
       if (count!=dict.size()-1){
         count++;
@@ -73,7 +93,7 @@ public class MapEncoder {
     BufferedReader br = new BufferedReader(new FileReader(new File(Config.bigramFile)));
     String line = null;
     while((line = br.readLine())!=null){
-      String[] items = line.split(",");
+      String[] items = line.split("`");
       map.put(new Pair(items[1],items[2]),Integer.parseInt(items[0]));
     }
     return map;

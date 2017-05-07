@@ -193,7 +193,9 @@ public static void generateTestFiles(String goldFilePath, String querFile,
 
     Map<String,HashSet<String>> candSet = CandidateGenerator.get().getCandidates(inputQuery,languageModel,nsm);
     sb.setLength(0);
-
+    HashSet<String> set = new HashSet<>();
+    set.add(inputQuery);
+    candSet.put("0",set);
 
     sb.append(inputQuery+";");
 
@@ -224,7 +226,7 @@ public static void generateTestFiles(String goldFilePath, String querFile,
       String editDisKey = entry.getKey();
       for (String str :entry.getValue()){
 
-        double candScore = getScoreForOneQuery(nsm,languageModel,original,"0",str);
+        double candScore = getScoreForOneQuery(nsm,languageModel,original,editDisKey,str);
         if (bestCand == null || candScore > bestScore){
           bestCand = str;
           bestScore = candScore;

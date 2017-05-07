@@ -39,8 +39,9 @@ public class LanguageModel implements Serializable {
 
   public Dictionary dict = new Dictionary();
   private static String[] stopWords = {"on","a","an","and","are","as","at","be","by","for","from","has","he","in","is","it","its","of","that","the","to","was","were","will","with"};
-//  private static String[] stopWords = {"the"};
-  private static String[] lengthOneWhiteList = {"i","a"};
+
+  //  private static String[] stopWords = {"the"};
+  private static String[] lengthOneWhiteList = {};
   private static String[] lengthTwoWhiteList = { };
 
   private static Set<String> whiteListSet=new HashSet<>();

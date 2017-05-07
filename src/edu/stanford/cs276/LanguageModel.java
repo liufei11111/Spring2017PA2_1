@@ -41,7 +41,7 @@ public class LanguageModel implements Serializable {
   private static String[] stopWords = {"on","a","an","and","are","as","at","be","by","for","from","has","he","in","is","it","its","of","that","the","to","was","were","will","with"};
 
   //  private static String[] stopWords = {"the"};
-  private static String[] lengthOneWhiteList = {};
+  private static String[] lengthOneWhiteList = {"a","i"};
   private static String[] lengthTwoWhiteList = { };
 
   private static Set<String> whiteListSet=new HashSet<>();
@@ -71,9 +71,9 @@ public class LanguageModel implements Serializable {
     for (String str:lengthTwoWhiteList){
       whiteListSet.add(str);
     }
-    for(String str : stopWords){
-      balckListSet.add(str);
-    }
+//    for(String str : stopWords){
+//      balckListSet.add(str);
+//    }
   }
 
   /**
@@ -326,13 +326,13 @@ public class LanguageModel implements Serializable {
       return Math.log(Config.eps);
     }else{
 //
-//      if (
-//          ( term.length()==1 || balckListSet.contains(term) )
-//              &&!whiteListSet.contains(term)
-//          ){
-//        double rescaled = Math.log(count);
-//        return Math.log(rescaled)-Math.log(dict.termCount);
-//      }
+      if (
+          ( term.length()==1 || balckListSet.contains(term) )
+              &&!whiteListSet.contains(term)
+          ){
+        double rescaled = Math.log(count);
+        return Math.log(rescaled)-Math.log(dict.termCount);
+      }
       return Math.log(count)-Math.log(dict.termCount);
     }
   }

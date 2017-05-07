@@ -55,9 +55,9 @@ public class UniformCostModel implements EditCostModel {
 //      distance+=1;
 //    }
       if (distance >=1){
-        return -4.605170185988091*distance;//precomputed for Math.log(Config.singleEditProb)*distance;
+        return  Math.log(Config.singleEditProb)*distance;//-4.605170185988091*distance;//precomputed for
       }else{
-        return -0.01005033585350145;//Math.log(1-Config.singleEditProb);
+        return Math.log(1-Config.singleEditProb);//-0.01005033585350145;
       }
 
 

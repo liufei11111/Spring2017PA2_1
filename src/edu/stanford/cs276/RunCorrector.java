@@ -21,7 +21,6 @@ public class RunCorrector {
     String goldFilePath = null;
     String extra = null;
     BufferedReader goldFileReader = null;
-    
     if (args.length == 2) {
       // Default: run without extra credit code or gold data comparison
       uniformOrEmpirical = args[0];
@@ -42,7 +41,14 @@ public class RunCorrector {
       extra = args[2];
       goldFilePath = args[3];
     } 
-    else {
+    else if (args.length == 5){
+      uniformOrEmpirical = args[0];
+      queryFilePath = args[1];
+      extra = args[2];
+      goldFilePath = args[3];
+      double tunningStep = Double.parseDouble(args[4]);
+      Config.languageModelScalingFactor = tunningStep/ 10;
+    }else{
       System.err.println(
           "Invalid arguments.  Argument count must be 2, 3 or 4 \n"
           + "./runcorrector <uniform | empirical> <query file> \n"

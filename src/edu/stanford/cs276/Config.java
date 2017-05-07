@@ -14,7 +14,7 @@ public class Config {
   public static final String occurence2File = "occurence2.txt";
   // tuned
   public static double languageModelScalingFactor = 0.93;// empirical value for language model scaling
-  public static double smoothingFactor=0.078;// empirical value for smoothing factor for unigram/bigram smoothing
+  public static double smoothingFactor=0.1;// empirical value for smoothing factor for unigram/bigram smoothing
   // assumed/ no need to tune
   public static double eps = 1e-256;
   public static int wordThreshold=25;

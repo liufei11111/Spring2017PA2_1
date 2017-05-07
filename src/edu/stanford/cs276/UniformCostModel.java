@@ -10,19 +10,23 @@ public class UniformCostModel implements EditCostModel {
 	private static final long serialVersionUID = 1L;
 	
   @Override
-  public double editProbability(String original, String R, int distance) {
+  public double editProbability(String original, String R, String dis) {
 //    int dis = editDistDP(original,R);
+    int distance = (int)(dis.charAt(0)-'0');
     String[] origStrs = original.split(" ");
     String[] rStrs = R.split(" ");
+    if (origStrs.length<rStrs.length){
+      distance+=1;
+    }
     // handle past/current tense conversion
-    if (origStrs.length == rStrs.length){
+    if (origStrs.length == rStrs.length) {
       int len = origStrs.length;
-      for (int i=0;i<len;++i){
+      for (int i = 0; i < len; ++i) {
         String origStr = origStrs[i];
         int origLen = origStrs[i].length();
         String rStr = rStrs[i];
         int rLen = rStrs[i].length();
-        if (rLen>origLen){
+        if (rLen > origLen) {
           int temp = rLen;
           String tempStr = rStr;
           rLen = origLen;
@@ -32,19 +36,24 @@ public class UniformCostModel implements EditCostModel {
 
         }
 
-        if (origLen-rLen<=2&& origStr.length()>=4&&origStr.substring(origLen-2).equals("ed")&&rLen>=3&&rStr.charAt(rLen-1)=='s'){
+        if (origLen - rLen <= 2 && origStr.length() >= 4 && origStr.substring(origLen - 2)
+            .equals("ed") && rLen >= 3 && rStr.charAt(rLen - 1) == 's') {
 //            System.out.println("Original: "+original+", R: "+R+", distance: "+distance);
-            distance-=2;
+          distance += 2;
 
-        }else if(origStr.length()>2&&origStr.charAt(origLen-1)=='s'&&origStr.substring(0,origLen-1).equals(rStr)){
-          distance-=1;
+        } else if (origStr.length() > 2 && origStr.charAt(origLen - 1) == 's' && origStr
+            .substring(0, origLen - 1).equals(rStr)) {
+          distance += 2;
         }
 
       }
-
-
-
     }
+//
+//
+//
+//    }else{
+//      distance+=1;
+//    }
       if (distance >=1){
         return Math.log(Config.singleEditProb)*distance;
       }else{

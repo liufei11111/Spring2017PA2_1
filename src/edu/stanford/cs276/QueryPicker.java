@@ -20,6 +20,7 @@ import java.util.Set;
  * Created by feiliu on 5/4/17.
  */
 public class QueryPicker {
+  static private int counter = 0;
   public static void main(String[] args) throws Exception {
 
     // Parse input arguments
@@ -61,9 +62,14 @@ public class QueryPicker {
     }
 
 
-
-    // Load models from disk
+//    // Load models from disk
     LanguageModel languageModel = LanguageModel.load();
+//    BufferedReader br = new BufferedReader(new FileReader(new File("orderbylengthgold.txt")));
+//    String goldterm = null;
+//    while((goldterm=br.readLine())!= null){
+//      System.out.println("Gold term"+goldterm);
+//    }
+//    System.out.println();
     NoisyChannelModel nsm = NoisyChannelModel.load();
     BufferedReader queriesFileReader = new BufferedReader(new FileReader(new File(queryFilePath)));
     nsm.setProbabilityType(uniformOrEmpirical);
@@ -127,6 +133,7 @@ public class QueryPicker {
         if (candSetPerQuery.length() == 0 || goldQuery.length() == 0) {
           break;
         }
+        System.out.println(counter++);
         Set<Pair<String, Integer>> canset = new HashSet<>();
         if (candSetPerQuery.contains(";")) {
           String[] firstParse = candSetPerQuery.split(";");

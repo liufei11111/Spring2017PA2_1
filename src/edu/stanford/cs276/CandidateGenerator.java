@@ -1,6 +1,9 @@
 package edu.stanford.cs276;
 
 import java.io.Serializable;
+
+import java.util.HashSet;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,6 +15,7 @@ public class CandidateGenerator implements Serializable {
 
 
   private static int coun = 0;
+  HashSet<String> record = new HashSet<String>();
 
   private static final long serialVersionUID = 1L;
   private static CandidateGenerator cg_;
@@ -364,7 +368,11 @@ public class CandidateGenerator implements Serializable {
             terms[errorIndex1] = t;
             String final_string = joinStrings( terms);
             if (!final_string.equals(query)) {
-              candidate.add(final_string);
+              if (record.contains(final_string)) {
+              } else {
+                record.add(final_string);
+                candidate.add(final_string);
+              }
             }
             terms[errorIndex1] = oldTerm1;
           }
@@ -428,7 +436,11 @@ public class CandidateGenerator implements Serializable {
               terms[i] = t;
               String final_string = joinStrings( terms);
               if (!final_string.equals(query)) {
-                candidate.add(final_string);
+                if (record.contains(final_string)) {
+                } else {
+                  record.add(final_string);
+                  candidate.add(final_string);
+                }
               }
               terms[i] = oldTerm1;
             }
@@ -571,10 +583,14 @@ public class CandidateGenerator implements Serializable {
               ArrayList<Integer> parseResult3 = invalidCount(querySpace2, dict);
               if (parseResult3.get(0) == 0) {
                 if (!querySpace2.equals(query)) {
-                  if (r < s) {
-                    candidates.get("2" + (char)('a' + r) + (char)('a' + s)).add(querySpace2);
+                  if (record.contains(querySpace2)) {
                   } else {
-                    candidates.get("2" + (char)('a' + s) + (char)('a' + r)).add(querySpace2);
+                    record.add(querySpace2);
+                    if (r < s) {
+                      candidates.get("2" + (char)('a' + r) + (char)('a' + s)).add(querySpace2);
+                    } else {
+                      candidates.get("2" + (char)('a' + s) + (char)('a' + r)).add(querySpace2);
+                    }
                   }
                 }
               }
@@ -585,7 +601,6 @@ public class CandidateGenerator implements Serializable {
     }
 
     coun++;
-    //System.err.println(coun);
     return candidates;
   }
   private String joinStrings(String[] strs){

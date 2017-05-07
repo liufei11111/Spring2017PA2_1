@@ -15,14 +15,14 @@ import java.util.ArrayList;
  */
 public class EmpiricalCostModel implements EditCostModel {
   private static final long serialVersionUID = 1L;
-  private static Map<ArrayList<Character>, Integer> del = new HashMap<ArrayList<Character>, Integer>();
-  private static Map<ArrayList<Character>, Integer> ins = new HashMap<ArrayList<Character>, Integer>();
-  private static Map<ArrayList<Character>, Integer> sub = new HashMap<ArrayList<Character>, Integer>();
-  private static Map<ArrayList<Character>, Integer> trans = new HashMap<ArrayList<Character>, Integer>();
-  private static Map<Character, Integer> occurence = new HashMap<Character, Integer>();
-  private static Map<ArrayList<Character>, Integer> occurence2 = new HashMap<ArrayList<Character>, Integer>();
+  public Map<String, Integer> del;
+  public Map<String, Integer> ins;
+  public Map<String, Integer> sub;
+  public Map<String, Integer> trans;
+  public Map<String, Integer> occurence;
+  public Map<String, Integer> occurence2;
 
-  private ArrayList<Character> getDelIndex(String noisy, String clean) {
+  private String getDelIndex(String noisy, String clean) {
     int index1 = 0;
     int index2 = 0;
     while(index1 < noisy.length() && index2 < clean.length()) {
@@ -41,13 +41,11 @@ public class EmpiricalCostModel implements EditCostModel {
       pre = noisy.charAt(index1 - 1);
     }
     cur = clean.charAt(index2);
-    ArrayList<Character> tuple = new ArrayList<Character>();
-    tuple.add(pre);
-    tuple.add(cur);
+    String tuple = pre + "" + cur;
     return tuple;
   }
 
-  private ArrayList<Character> getInsIndex(String noisy, String clean) {
+  private String getInsIndex(String noisy, String clean) {
     int index1 = 0;
     int index2 = 0;
     while(index1 < noisy.length() && index2 < clean.length()) {
@@ -66,13 +64,11 @@ public class EmpiricalCostModel implements EditCostModel {
       pre = clean.charAt(index2 - 1);
     }
     cur = noisy.charAt(index1);
-    ArrayList<Character> tuple = new ArrayList<Character>();
-    tuple.add(pre);
-    tuple.add(cur);
+    String tuple = pre + "" + cur;
     return tuple;
   }
 
-  private ArrayList<Character> getSubIndex(String noisy, String clean) {
+  private String getSubIndex(String noisy, String clean) {
     int index1 = 0;
     int index2 = 0;
     char pre = (char)0;
@@ -95,15 +91,18 @@ public class EmpiricalCostModel implements EditCostModel {
         }
       }
     }
-    ArrayList<Character> tuple = new ArrayList<Character>();
-    tuple.add(pre);
-    tuple.add(cur);
-    tuple.add((char)appear);
+    String tuple = pre + "" + cur + "" + (char)appear;
     return tuple;
   }
 
 
   public EmpiricalCostModel(String editsFile) throws IOException {
+    del = new HashMap<String, Integer>();
+    ins = new HashMap<String, Integer>();
+    sub = new HashMap<String, Integer>();
+    trans = new HashMap<String, Integer>();
+    occurence = new HashMap<String, Integer>();
+    occurence2 = new HashMap<String, Integer>();
     BufferedReader input = new BufferedReader(new FileReader(editsFile));
     System.out.println("Constructing edit distance map...");
     String line = null;
@@ -118,16 +117,15 @@ public class EmpiricalCostModel implements EditCostModel {
         if (i >= 0) {
           c = clean.charAt(i);
         }
-        if (occurence.containsKey(c)) {
-          occurence.put(c, occurence.get(c) + 1);
+        String fake_tuple = c + "";
+        if (occurence.containsKey(fake_tuple)) {
+          occurence.put(fake_tuple, occurence.get(fake_tuple) + 1);
         } else {
-          occurence.put(c, 1);
+          occurence.put(fake_tuple, 1);
         }
         if (i != clean.length() - 1) {
           char c2 = clean.charAt(i + 1);
-          ArrayList<Character> tuple = new ArrayList<Character>();
-          tuple.add(c);
-          tuple.add(c2);
+          String tuple = c + "" + c2;
           if (occurence2.containsKey(tuple)) {
             occurence2.put(tuple, occurence2.get(tuple) + 1);
           } else {
@@ -136,9 +134,9 @@ public class EmpiricalCostModel implements EditCostModel {
         }
       }
       if (noisy.length() == clean.length()) {
-        ArrayList<Character> tuple = getSubIndex(noisy, clean);
-        int appear = tuple.get(2);
-        tuple.remove(2);
+        String tuple = getSubIndex(noisy, clean);
+        int appear = (int)tuple.charAt(2);
+        tuple = tuple.substring(0, 2);
         if (appear == 1) {
           if (sub.containsKey(tuple)) {
             sub.put(tuple, sub.get(tuple) + 1);
@@ -153,14 +151,14 @@ public class EmpiricalCostModel implements EditCostModel {
           }
         }
       } else if (noisy.length() == clean.length() + 1) {
-        ArrayList<Character> tuple = getInsIndex(noisy, clean);
+        String tuple = getInsIndex(noisy, clean);
         if (ins.containsKey(tuple)) {
           ins.put(tuple, ins.get(tuple) + 1);
         } else {
           ins.put(tuple, 1);
         }
       } else if (noisy.length() == clean.length() - 1) {
-        ArrayList<Character> tuple = getDelIndex(noisy, clean);
+        String tuple = getDelIndex(noisy, clean);
         if (del.containsKey(tuple)) {
           del.put(tuple, del.get(tuple) + 1);
         } else {
@@ -176,7 +174,7 @@ public class EmpiricalCostModel implements EditCostModel {
 
   // You need to add code for this interface method to calculate the proper empirical cost.
   @Override
-  public double editProbability(String cand, String query, String dis) {
+  public double editProbability(String query, String cand, String dis) {
     int distance = dis.charAt(0) - '0';
     if (distance == 0) {
       return 0.95;
@@ -356,6 +354,7 @@ public class EmpiricalCostModel implements EditCostModel {
       } else {
         if (op1 == 'b' && op2 == 'd') {
         } else if (op1 =='d' && op2 == 'b') {
+        } else if (op1 =='d' && op2 == 'd') {
         } else {
           System.err.println("impossible v2!");
         }
@@ -369,9 +368,10 @@ public class EmpiricalCostModel implements EditCostModel {
     int term_size = occurence.size();
     int term_tuple_size = (term_size - 1) * term_size;
     for (int i = 0; i < processed_op; i++) {
-      ArrayList<Character> tuple = new ArrayList<Character>();
-      tuple.add(pre[i]);
-      tuple.add(cur[i]);
+      String tuple = pre[i] + "" + cur[i];
+      String fake_tuple0 = pre[i] + "";
+      String fake_tuple1 = cur[i] + "";
+
       int qwe = 0;
       int rty = 0;
       switch(sym[i]) {
@@ -380,9 +380,9 @@ public class EmpiricalCostModel implements EditCostModel {
           if (ins.containsKey(tuple)) {
             qwe = ins.get(tuple);
           }
-           rty = 0;
-         if (occurence.containsKey(tuple.get(0))) {
-           rty = occurence.get(tuple.get(0));
+          rty = 0;
+         if (occurence.containsKey(fake_tuple0)) {
+           rty = occurence.get(fake_tuple0);
          }
          prob = prob * (double)(qwe + 1) / (rty + term_size);
          break;
@@ -403,8 +403,8 @@ public class EmpiricalCostModel implements EditCostModel {
             qwe = sub.get(tuple);
           }
           rty = 0;
-          if (occurence.containsKey(tuple.get(1))) {
-            rty = occurence.get(tuple.get(1));
+          if (occurence.containsKey(fake_tuple1)) {
+            rty = occurence.get(fake_tuple1);
           }
           prob = prob * (double)(qwe + 1) / (rty + term_size);
           break;

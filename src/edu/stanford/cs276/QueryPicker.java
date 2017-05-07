@@ -85,7 +85,7 @@ public class QueryPicker {
 //    String candSetPerQuery = null;
 //    int languageModelScaleingFactorSpace = 100;
 //    int smoothingFactor = 50;
-    int languageModelScaleingFactorSpace = 50;
+    int languageModelScaleingFactorSpace = 10;
     int smoothingFactor = 1;
 //    int smoothingFactor = 80;
     for (int i=0;i<languageModelScaleingFactorSpace;++i){
@@ -104,7 +104,7 @@ public class QueryPicker {
       goldFileReader = new BufferedReader(new FileReader(new File(goldFilePath)));
     }
 
-    Config.languageModelScalingFactor = (i+1)*1 / iSize ;
+    Config.languageModelScalingFactor = (i+1)*1.0 / iSize ;
 //    Config.smoothingFactor = (j+1)*0.1 /jSize;
     String indexI = ""+i;
     String indexJ = ""+j;
@@ -133,7 +133,7 @@ public class QueryPicker {
         if (candSetPerQuery.length() == 0 || goldQuery.length() == 0) {
           break;
         }
-        System.out.println(counter++);
+//        System.out.println(counter++);
         Set<Pair<String, String>> canset = new HashSet<>();
         if (candSetPerQuery.contains(";")) {
           String[] firstParse = candSetPerQuery.split(";");

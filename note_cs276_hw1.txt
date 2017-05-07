@@ -27,10 +27,17 @@ time java -Xmx6024m -cp classes edu.stanford.cs276.QueryPicker empirical data/de
 
 ## Production
 
-time ./buildmodels.sh data/corpus data/training_set/edit1s.txt
+date; ./buildmodels.sh data/corpus data/training_set/edit1s.txt; date
+Sat May  6 22:59:40 PDT 2017
+Sat May  6 23:01:43 PDT 2017
 
-time ./runcorrector.sh empirical data/dev_set/queries.txt extra data/dev_set/gold.txt
+date;time ./runcorrector.sh uniform data/dev_set/queries.txt extra data/dev_set/gold.txt;date
+Sat May  6 23:09:56 PDT 2017
 
+
+date;time ./runcorrector.sh empirical data/dev_set/queries.txt extra data/dev_set/gold.txt;date
+Sat May  6 23:07:20 PDT 2017
+Sat May  6 23:09:17 PDT 2017
 
 ls | grep -v Prob | sort | xargs -I {} bash -c "cat {} | wc -l;echo {}"
 

@@ -138,7 +138,7 @@ public class LanguageModel implements Serializable {
 
     }
     // end of directory level
-//    System.out.println("Total word count is : "+count);
+    System.out.println("Total word count is : "+count);
     List<Entry<String,Integer>> list = new ArrayList<>(dict.unigram.entrySet());
     Collections.sort(list, new Comparator<Entry<String, Integer>>() {
       @Override
@@ -181,7 +181,7 @@ public class LanguageModel implements Serializable {
         goldCharSet.add(aChar);
       }
     }
-//    System.out.println("number of lines read for gold.txt: "+goldLines);
+    System.out.println("number of lines read for gold.txt: "+goldLines);
     List<Entry<String,Integer>>listOfGolds = new ArrayList<>(goldDic.entrySet());
     Collections.sort(listOfGolds, new Comparator<Entry<String, Integer>>() {
       @Override

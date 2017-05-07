@@ -25,6 +25,7 @@ public class RunCorrector {
     String extra = null;
     BufferedReader goldFileReader = null;
     int tunningStep = 1;
+    String debug = null;
     if (args.length == 2) {
       // Default: run without extra credit code or gold data comparison
       uniformOrEmpirical = args[0];
@@ -51,7 +52,13 @@ public class RunCorrector {
       extra = args[2];
       goldFilePath = args[3];
       tunningStep = Integer.parseInt(args[4]);
-
+    }else if (args.length == 6){
+      uniformOrEmpirical = args[0];
+      queryFilePath = args[1];
+      extra = args[2];
+      goldFilePath = args[3];
+      tunningStep = Integer.parseInt(args[4]);
+      debug = args[5];
     }else{
       System.err.println(
           "Invalid arguments.  Argument count must be 2, 3 or 4 \n"
@@ -79,7 +86,7 @@ public class RunCorrector {
 
 
     for(int k =0;k<tunningStep;++k){
-      if (tunningStep!=1){
+      if (tunningStep!=1&&debug!=null){
         Config.languageModelScalingFactor = k*1.0/ tunningStep;
       }
       String query = null;
@@ -123,7 +130,7 @@ public class RunCorrector {
            * diverges from the gold file, what type of errors are more common etc. This might
            * help you improve your candidate generation/scoring steps
            */
-          if (goldQuery!= null && !goldQuery.equals(correctedQuery)){
+          if (tunningStep!=1&&goldQuery!= null && !goldQuery.equals(correctedQuery)){
             mismatchCount++;
             fw.write("Gold: "+goldQuery+", Mine: "+correctedQuery+", Original: "+query+"\n");
           }
@@ -136,7 +143,7 @@ public class RunCorrector {
          */
         System.out.println(correctedQuery);
       }
-      System.out.println("Total mistaches: "+ mismatchCount);
+     if (tunningStep!=1){ System.out.println("Total mistaches: "+ mismatchCount);}
       fw.close();
       queriesFileReader.close();
     }

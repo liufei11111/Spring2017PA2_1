@@ -18,6 +18,6 @@ public class Config {
   // assumed/ no need to tune
   public static double eps = 1e-300;
   public static int wordThreshold=25;
-  public static double singleEditProb = 0.01;// 145 .. from 0.005 - 0.1 roughtly the same
+  public static double singleEditProb = 0.01;
 
 }

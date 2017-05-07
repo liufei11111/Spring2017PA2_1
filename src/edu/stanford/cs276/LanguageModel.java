@@ -7,12 +7,23 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 import edu.stanford.cs276.util.Dictionary;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * LanguageModel class constructs a language model from the training corpus.
@@ -27,7 +38,12 @@ public class LanguageModel implements Serializable {
   private static LanguageModel lm_;
 
   public Dictionary dict = new Dictionary();
+  private static String[] stopWords = {"on","a","an","and","are","as","at","be","by","for","from","has","he","in","is","it","its","of","that","the","to","was","were","will","with"};
+  private static String[] lengthOneWhiteList = {"i"};
+  private static String[] lengthTwoWhiteList = { };
 
+  private static Set<String> whiteListSet=new HashSet<>();
+  private static Set<String> balckListSet=new HashSet<>();
   /*
    * Feel free to add more members here (e.g., a data structure that stores bigrams)
    */
@@ -46,6 +62,16 @@ public class LanguageModel implements Serializable {
    */
   private LanguageModel(String corpusFilePath) throws Exception {
     constructDictionaries(corpusFilePath);
+
+    for (String str:lengthOneWhiteList){
+      whiteListSet.add(str);
+    }
+    for (String str:lengthTwoWhiteList){
+      whiteListSet.add(str);
+    }
+    for(String str : stopWords){
+      balckListSet.add(str);
+    }
   }
 
   /**
@@ -57,14 +83,15 @@ public class LanguageModel implements Serializable {
 
     System.out.println("Constructing dictionaries...");
     File dir = new File(corpusFilePath);
-//    FileWriter fw = new FileWriter(new File("unigram.txt"));
-//    FileWriter fw1 = new FileWriter(new File("nonExistenceChars.txt"));
-//    FileWriter fw2 = new FileWriter(new File("completeChars.txt"));
-//    FileWriter fw3 = new FileWriter(new File("orderbylength.txt"));
-//    FileWriter fw4 = new FileWriter(new File("orderbylengthgold.txt"));
-//    FileWriter fw5 = new FileWriter(new File("wordsNotCoveredInGold.txt"));
+    FileWriter fw = new FileWriter(new File("unigram.txt"));
+    FileWriter fw1 = new FileWriter(new File("nonExistenceChars.txt"));
+    FileWriter fw2 = new FileWriter(new File("completeChars.txt"));
+    FileWriter fw3 = new FileWriter(new File("orderbylength.txt"));
+    FileWriter fw4 = new FileWriter(new File("orderbyCountgold.txt"));
+    FileWriter fw6 = new FileWriter(new File("orderbyWordLengold.txt"));
+    FileWriter fw5 = new FileWriter(new File("wordsNotCoveredInGold.txt"));
 
-
+    int count = 0;
 
     for (File file : dir.listFiles()) {
       if (".".equals(file.getName()) || "..".equals(file.getName())) {
@@ -81,95 +108,147 @@ public class LanguageModel implements Serializable {
          * Remember: each line is a document (refer to PA2 handout)
          *
          */
-//        line= line.replaceAll("_+"," ");
-//        line = line.replaceAll("\\s+"," ");
-        String[] tokens = line.trim().split(" ");
-        for (int i=0;i<tokens.length;++i){
-          boolean foundNum = containsNumberTooShortOrTooLong(tokens[i]);
+
+        List<String> tokens = purgeLine(line.trim().split(" "));
+        for (int i=0;i<tokens.size();++i){
+          boolean foundNum = containsNumberTooShortOrTooLong(tokens.get(i));
+          String thieToken = tokens.get(i);
           if (foundNum){continue;}
-          if (i!=tokens.length-1&&!containsNumberTooShortOrTooLong(tokens[i+1])){
-            Pair<String,String> bigramPair = new Pair<>(tokens[i],tokens[i+1]);
+          if (i!=tokens.size()-1&&!containsNumberTooShortOrTooLong(tokens.get(i+1))){
+            Pair<String,String> bigramPair = new Pair<>(tokens.get(i),tokens.get(i+1));
             if (dict.bigram.containsKey(bigramPair)){
               dict.bigram.put(bigramPair, dict.bigram.get(bigramPair)+1);
             }else{
               dict.bigram.put(bigramPair,1);
             }
           }
-          if (dict.unigram.containsKey(tokens[i])){
-            dict.unigram.put(tokens[i], dict.unigram.get(tokens[i])+1);
+          if (dict.unigram.containsKey(tokens.get(i))){
+            dict.unigram.put(tokens.get(i), dict.unigram.get(tokens.get(i))+1);
 
           }else{
-            dict.unigram.put(tokens[i],1);
+            dict.unigram.put(tokens.get(i),1);
           }
         }
 
       }
 
+      for(Entry<String,Integer> entry : dict.unigram.entrySet()){
+        count+=entry.getValue();
+      }
 
     }
-//    List<Entry<String,Integer>> list = new ArrayList<>(dict.unigram.entrySet());
-//    Collections.sort(list, new Comparator<Entry<String, Integer>>() {
-//      @Override
-//      public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
-//        return o2.getValue().compareTo(o1.getValue());
-//      }
-//    });
-//    for (int i=0;i<list.size();++i){
-//      fw.write(list.get(i).getKey()+","+list.get(i).getValue()+"\n");
-//    }
-//    fw.close();
-//    Collections.sort(list, new Comparator<Entry<String, Integer>>() {
-//      @Override
-//      public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
-//        return o2.getKey().length()-(o1.getKey().length());
-//      }
-//    });
-//    for (int i=0;i<list.size();++i){
-//      fw3.write(list.get(i).getKey()+","+list.get(i).getValue()+"\n");
-//    }
-//    fw3.close();
-//    Set<Character> goldCharSet = new HashSet<>();
-//    BufferedReader gold = new BufferedReader(new FileReader("data/dev_set/gold.txt"));
-//    HashMap<String, Integer> goldDic = new HashMap<>();
-//    String line = null;
-//    while ((line = gold.readLine())!= null){
-//      for (String str : line.split(" ")){
-//        if (goldDic.containsKey(str)){
-//          goldDic.put(str,goldDic.get(str)+1);
-//        }else{
-//          goldDic.put(str,1);
-//        }
-//      }
-//      for (char aChar : line.toCharArray()){
-//        goldCharSet.add(aChar);
-//      }
-//    }
-//    list = new ArrayList<>(goldDic.entrySet());
-//    Collections.sort(list, new Comparator<Entry<String, Integer>>() {
-//      @Override
-//      public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
-//        return o2.getValue().compareTo(o1.getValue());
-//      }
-//    });
-//    for (Entry<String,Integer> entry:list){
-//      fw4.write(entry.getKey()+","+entry.getValue()+"\n");
-//    }
-//    Set<String> setNotInGoldInDIc = goldDic.keySet();
-//    setNotInGoldInDIc.removeAll(dict.unigram.keySet());
-//    for (String str : setNotInGoldInDIc){
-//      fw5.write(str+"\n");
-//    }
-//
-//    fw1.close();
-//    fw2.close();
-//    fw3.close();
-//    gold.close();
-//    fw4.close();
-//    fw5.close();
+    // end of directory level
+//    System.out.println("Total word count is : "+count);
+    List<Entry<String,Integer>> list = new ArrayList<>(dict.unigram.entrySet());
+    Collections.sort(list, new Comparator<Entry<String, Integer>>() {
+      @Override
+      public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
+        return o2.getValue().compareTo(o1.getValue());
+      }
+    });
+    for (int i=0;i<list.size();++i){
+      fw.write(list.get(i).getKey()+","+list.get(i).getValue()+"\n");
+    }
+    fw.close();
+    Collections.sort(list, new Comparator<Entry<String, Integer>>() {
+      @Override
+      public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
+        return o2.getKey().length()-(o1.getKey().length());
+      }
+    });
+    for (int i=0;i<list.size();++i){
+      fw3.write(list.get(i).getKey()+","+list.get(i).getValue()+"\n");
+    }
+    fw3.close();
 
+
+    // Gold generation
+    Set<Character> goldCharSet = new HashSet<>();
+    BufferedReader gold = new BufferedReader(new FileReader("data/dev_set/gold.txt"));
+    HashMap<String, Integer> goldDic = new HashMap<>();
+    String line = null;
+    int goldLines = 0;
+    while ((line = gold.readLine())!= null){
+      goldLines++;
+      for (String str : line.split(" ")){
+        if (goldDic.containsKey(str)){
+          goldDic.put(str,goldDic.get(str)+1);
+        }else{
+          goldDic.put(str,1);
+        }
+      }
+      for (char aChar : line.toCharArray()){
+        goldCharSet.add(aChar);
+      }
+    }
+//    System.out.println("number of lines read for gold.txt: "+goldLines);
+    List<Entry<String,Integer>>listOfGolds = new ArrayList<>(goldDic.entrySet());
+    Collections.sort(listOfGolds, new Comparator<Entry<String, Integer>>() {
+      @Override
+      public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
+        return o2.getValue().compareTo(o1.getValue());
+      }
+    });
+    for (Entry<String,Integer> entry:listOfGolds){
+      fw4.write(entry.getKey()+","+entry.getValue()+"\n");
+    }
+    Collections.sort(listOfGolds, new Comparator<Entry<String, Integer>>() {
+      @Override
+      public int compare(Entry<String, Integer> o1, Entry<String, Integer> o2) {
+        return o2.getKey().length()-o1.getKey().length();
+      }
+    });
+    for (Entry<String,Integer> entry:listOfGolds){
+      fw6.write(entry.getKey()+","+entry.getValue()+"\n");
+    }
+    Set<String> setNotInGoldInDIc = goldDic.keySet();
+    setNotInGoldInDIc.removeAll(dict.unigram.keySet());
+    for (String str : setNotInGoldInDIc){
+      fw5.write(str+"\n");
+    }
+
+    fw1.close();
+    fw2.close();
+    fw3.close();
+    gold.close();
+    fw4.close();
+    fw5.close();
+    fw6.close();
     System.out.println("Done.");
   }
 
+  private List<String> purgeLine(String[] split) {
+    List<String> candsList = new ArrayList<>();
+    for (String str : split){
+      String  line= str.replaceAll("_+"," ");
+      line = line.replaceAll("\\s+"," ");
+      if (line.equals(" ")||line.isEmpty()){
+        continue;
+      }
+      if (!line.contains(" ")){
+
+        candsList.addAll(tearForNumber(line));
+      }else{
+        String[] cands = line.split(" ");
+        for (String cand : cands){
+          candsList.addAll(tearForNumber(line));
+        }
+
+      }
+
+    }
+    return candsList;
+  }
+  private List<String> tearForNumber(String str){
+    str.replaceAll(""," ");
+    str.replaceAll(" +"," ");
+    String[] terms = str.split(" ");
+    List<String> list = new LinkedList<>();
+    for (String term : terms){
+      list.add(term);
+    }
+    return list;
+  }
   private boolean containsNumberTooShortOrTooLong(String str) {
     int len = str.length();
     if (len>Config.wordThreshold||len==0){return true;}
@@ -242,20 +321,30 @@ public class LanguageModel implements Serializable {
     if (count == null){
       return Math.log(Config.eps);
     }else{
-      if (term.length()<=2){
-        double rescaled = Math.log(count);
+
+      if (
+          ( term.length()==1 || balckListSet.contains(term) )
+              &&!whiteListSet.contains(term)
+          ){
+        double rescaled = Math.sqrt(count);
         return Math.log(rescaled)-Math.log(dict.termCount);
       }
       return Math.log(count)-Math.log(dict.termCount);
     }
   }
-  public double getConditionalProd(String term1, String term2) {
-    double unigramScore = unigramProbForTerm(term2);
-    if (term1 == null){
-      return unigramScore;
+  public double getConditionalProd(String[] terms, int index) {
+    if (index<0||index>=terms.length){return Double.NaN;}
+    double unigramScore = unigramProbForTerm(terms[index]);
+    if (index == 0){
+      double termUnigram = rawCountForTerm(terms[index]);
+      double countBigram = rawBiCountForTerms(terms[index],terms[index+1]);
+      double bigramScore = Math.log(countBigram+Config.eps)-Math.log(termUnigram+Config.eps);
+      return unigramScore+unigramScore*Config.smoothingFactor+bigramScore*(1-Config.smoothingFactor);
     }
-    double termUnigram = rawCountForTerm(term1);
-    double countBigram = rawBiCountForTerms(term1,term2);
+
+
+    double termUnigram = rawCountForTerm(terms[index]);
+    double countBigram = rawBiCountForTerms(terms[index],terms[index+1]);
     double bigramScore = Math.log(countBigram+Config.eps)-Math.log(termUnigram+Config.eps);
     // we use bigram to decide which word is wrong. and we just need to log of count and total is constant and can be ignored
     return  unigramScore*Config.smoothingFactor+bigramScore*(1-Config.smoothingFactor);
@@ -283,12 +372,9 @@ public class LanguageModel implements Serializable {
 //    String[] terms = query.split(" ");
     double logLanguageScore = 0.0; // log 1
     for(int i=0;i<terms.length-1;++i){
-      if (i==0) {
         // raw count is good as the total count is a constant
-        logLanguageScore += getConditionalProd(null,terms[i]);
-      }else{
-        logLanguageScore+=getConditionalProd(terms[i],terms[i+1]);
-      }
+        logLanguageScore += getConditionalProd(terms,i);
+
     }
     return logLanguageScore;
   }

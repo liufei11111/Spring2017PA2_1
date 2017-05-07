@@ -75,10 +75,10 @@ public class RunCorrector {
     while ((query = queriesFileReader.readLine()) != null) {
 
       String correctedQuery = query;
-      Map<Integer, HashSet<String>> candidateQuery = CandidateGenerator.get().getCandidates(query,languageModel,nsm);
+      Map<String, HashSet<String>> candidateQuery = CandidateGenerator.get().getCandidates(query,languageModel,nsm);
       QueryPicker picker = new QueryPicker();
       //TODO funciton signiture match
-//      correctedQuery = picker.getBestQuery(candidateQuery,languageModel,nsm,CandidateGenerator.get(),query);
+      correctedQuery = picker.getBestQuery(candidateQuery,languageModel,nsm,CandidateGenerator.get(),query,null);
       /*
        * Your code here: currently the correctQuery and original query are the same
        * Complete this implementation so that the spell corrector corrects the 

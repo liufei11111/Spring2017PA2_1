@@ -104,7 +104,7 @@ public class QueryPicker {
       goldFileReader = new BufferedReader(new FileReader(new File(goldFilePath)));
     }
 
-    Config.languageModelScalingFactor = (i+1)*1.0 / iSize ;
+    Config.languageModelScalingFactor = 0.9+(i+1)*0.1 / iSize ;
 //    Config.smoothingFactor = (j+1)*0.1 /jSize;
     String indexI = ""+i;
     String indexJ = ""+j;

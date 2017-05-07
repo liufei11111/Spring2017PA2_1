@@ -8,6 +8,7 @@ import java.util.Scanner;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.ArrayList;
+import java.math.*;
 
 /**
  * Implement {@link EditCostModel} interface. Use the query corpus to learn a model
@@ -177,7 +178,7 @@ public class EmpiricalCostModel implements EditCostModel {
   public double editProbability(String query, String cand, String dis) {
     int distance = dis.charAt(0) - '0';
     if (distance == 0) {
-      return 0.95;
+      return Math.log(0.95);
     }
     char op1;
     char op2;
@@ -361,7 +362,7 @@ public class EmpiricalCostModel implements EditCostModel {
       }
       // I have verfied that every case is indeed impossbile!
       // e.g. orf -> for, irn-> ni.
-      return 0.0;
+      return -100.0;
     }
 
     double prob = 1.0;
@@ -421,6 +422,6 @@ public class EmpiricalCostModel implements EditCostModel {
           break;
       }
     }
-    return prob;
+    return Math.log(prob);
   }
 }

@@ -20,7 +20,7 @@ time java -Xmx6024m -cp classes edu.stanford.cs276.QueryPicker uniform data/dev_
 ## empirical
 
 # first time
-time java -Xmx6024m -cp classes edu.stanford.cs276.QueryPicker empirical data/dev_set/queries.txt extra  data/dev_set/gold.txt
+time java -Xmx6024m -cp classes edu.stanford.cs276.QueryPicker empirical data/dev_set/queries.txt extra  data/dev_set/gold.txt、
 # there after
 time java -Xmx6024m -cp classes edu.stanford.cs276.QueryPicker empirical data/dev_set/queries.txt  data/dev_set/gold.txt
 

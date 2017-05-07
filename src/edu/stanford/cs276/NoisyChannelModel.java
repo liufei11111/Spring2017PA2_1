@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import edu.stanford.cs276.util.MapEncoder;
 
 /**
  * NoisyChannelModel class constructs a channel model (which is a model of errors that
@@ -16,8 +17,7 @@ import java.io.Serializable;
  * (https://en.wikipedia.org/wiki/Singleton_pattern).
  */
 public class NoisyChannelModel implements Serializable {
-	
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
   private static NoisyChannelModel ncm_ = null;
   EditCostModel ecm_ = null;
 
@@ -69,6 +69,19 @@ public class NoisyChannelModel implements Serializable {
         FileInputStream fiA = new FileInputStream(Config.noisyChannelFile);
         ObjectInputStream oisA = new ObjectInputStream(fiA);
         ncm_ = (NoisyChannelModel) oisA.readObject();
+        MapEncoder me = new MapEncoder();
+        ncm_.empiricalCostModel.del =
+            me.retrieveMapStringInteger(Config.delFile);
+        ncm_.empiricalCostModel.ins =
+            me.retrieveMapStringInteger(Config.insFile);
+        ncm_.empiricalCostModel.sub =
+            me.retrieveMapStringInteger(Config.subFile);
+        ncm_.empiricalCostModel.trans =
+            me.retrieveMapStringInteger(Config.transFile);
+        ncm_.empiricalCostModel.occurence =
+            me.retrieveMapStringInteger(Config.occurenceFile);
+        ncm_.empiricalCostModel.occurence2 =
+            me.retrieveMapStringInteger(Config.occurence2File);
         oisA.close();
       }
     } catch (Exception e) {
@@ -83,6 +96,19 @@ public class NoisyChannelModel implements Serializable {
   public void save() throws Exception {
     FileOutputStream saveFile = new FileOutputStream(Config.noisyChannelFile);
     ObjectOutputStream save = new ObjectOutputStream(saveFile);
+    MapEncoder me = new MapEncoder();
+    me.saveMapStringInteger(empiricalCostModel.del, Config.delFile);
+    me.saveMapStringInteger(empiricalCostModel.ins, Config.insFile);
+    me.saveMapStringInteger(empiricalCostModel.sub, Config.subFile);
+    me.saveMapStringInteger(empiricalCostModel.trans, Config.transFile);
+    me.saveMapStringInteger(empiricalCostModel.occurence, Config.occurenceFile);
+    me.saveMapStringInteger(empiricalCostModel.occurence2, Config.occurence2File);
+    empiricalCostModel.del = null;
+    empiricalCostModel.ins = null;
+    empiricalCostModel.sub = null;
+    empiricalCostModel.trans = null;
+    empiricalCostModel.occurence = null;
+    empiricalCostModel.occurence2 = null;
     save.writeObject(this);
     save.close();
   }

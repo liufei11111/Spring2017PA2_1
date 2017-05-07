@@ -215,18 +215,16 @@ public static void generateTestFiles(String goldFilePath, String querFile,
 }
   public String getBestQuery(Map<String, HashSet<String>> candSet, LanguageModel languageModel,
       NoisyChannelModel nsm, CandidateGenerator canG, String original, FileWriter testInfoWriter) throws Exception {
-    String bestCand = null;
-    double bestScore = Double.MIN_VALUE;
+
+    String bestCand = original;
+    double bestScore = getScoreForOneQuery(nsm,languageModel,original,"0",original);
     StringBuffer candidateBuffer = new StringBuffer();
     candidateBuffer.append(original+"$");
     for (Entry<String,HashSet<String>> entry : candSet.entrySet()){
       String editDisKey = entry.getKey();
       for (String str :entry.getValue()){
-        String[] terms = str.split(" " );
-        double noisyScore = nsm.getEditCostModel().editProbability(original,str,editDisKey);
-        double languageScore = languageModel.genLanguageScore(terms);
-        double candScore = noisyScore+Config.languageModelScalingFactor * languageScore;
-        candidateBuffer.append(str+":: <"+languageScore+","+noisyScore+","+candScore+">|");
+
+        double candScore = getScoreForOneQuery(nsm,languageModel,original,"0",str);
         if (bestCand == null || candScore > bestScore){
           bestCand = str;
           bestScore = candScore;
@@ -238,5 +236,12 @@ public static void generateTestFiles(String goldFilePath, String querFile,
     }
 
     return bestCand;
+  }
+
+  private double getScoreForOneQuery(NoisyChannelModel nsm, LanguageModel languageModel, String original,String editDisKey,String  candidate) {
+    String[] terms = candidate.split(" " );
+    double noisyScore = nsm.getEditCostModel().editProbability(original,candidate,editDisKey);
+    double languageScore = languageModel.genLanguageScore(terms);
+    return noisyScore+Config.languageModelScalingFactor * languageScore;
   }
 }

@@ -87,6 +87,7 @@ public class RunCorrector {
         }
 
       }
+      candSet.add(new Pair<>(query,"0"));
       correctedQuery = picker.getBestQuery(candSet,languageModel,nsm,CandidateGenerator.get(),query,null);
       /*
        * Your code here: currently the correctQuery and original query are the same

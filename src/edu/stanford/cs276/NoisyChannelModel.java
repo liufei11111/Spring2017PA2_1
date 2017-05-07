@@ -103,6 +103,12 @@ public class NoisyChannelModel implements Serializable {
     me.saveMapStringInteger(empiricalCostModel.trans, Config.transFile);
     me.saveMapStringInteger(empiricalCostModel.occurence, Config.occurenceFile);
     me.saveMapStringInteger(empiricalCostModel.occurence2, Config.occurence2File);
+    empiricalCostModel.del = null;
+    empiricalCostModel.ins = null;
+    empiricalCostModel.sub = null;
+    empiricalCostModel.trans = null;
+    empiricalCostModel.occurence = null;
+    empiricalCostModel.occurence2 = null;
     save.writeObject(this);
     save.close();
   }

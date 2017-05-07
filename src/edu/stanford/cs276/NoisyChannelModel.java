@@ -74,7 +74,7 @@ public class NoisyChannelModel implements Serializable {
             me.retrieveMapStringInteger(Config.delFile);
         ncm_.empiricalCostModel.ins =
             me.retrieveMapStringInteger(Config.insFile);
-        ncm_.empiricalCostModel.del =
+        ncm_.empiricalCostModel.sub =
             me.retrieveMapStringInteger(Config.subFile);
         ncm_.empiricalCostModel.trans =
             me.retrieveMapStringInteger(Config.transFile);

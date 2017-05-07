@@ -37,15 +37,4 @@ public class Dictionary implements Serializable {
     }
   }
 
-  public double logUnigramProb(String term){
-    return 0.0;
-  }
-  public double logbigramConditionalProb(String term1, String term2){
-    return 0.0;
-  }
-
-  public double jointProbability(List<String> term){
-    return 0.0;
-  }
-
 }

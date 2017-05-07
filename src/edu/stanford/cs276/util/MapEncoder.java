@@ -73,7 +73,6 @@ public class MapEncoder {
   }
   public void saveBigram( Map<Pair<String,String>,Integer> dict)
       throws IOException {
-//    RandomAccessFile rafUnigram = new RandomAccessFile(Config.unigramFile,"rw");
     FileWriter fw = new FileWriter(Config.bigramFile);
     int count = 0;
     for (Entry<Pair<String,String>, Integer> entry:dict.entrySet()){

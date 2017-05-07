@@ -128,12 +128,13 @@ public class QueryPicker {
     String candSetPerQuery = null;
     String originalQuery = null;
     try {
+      int counter = 0;
       while (((goldQuery = goldFileReader.readLine()) != null)
           && (candSetPerQuery = brCanSet.readLine()) != null) {
         if (candSetPerQuery.length() == 0 || goldQuery.length() == 0) {
           break;
         }
-//        System.out.println(counter++);
+        System.out.println(counter++);
         Set<Pair<String, String>> canset = new HashSet<>();
         if (candSetPerQuery.contains(";")) {
           String[] firstParse = candSetPerQuery.split(";");

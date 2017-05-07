@@ -86,7 +86,6 @@ public class LanguageModel implements Serializable {
         List<String> tokens = purgeLine(line.trim().split(" "));
         for (int i=0;i<tokens.size();++i){
           boolean foundNum = containsNumberTooShortOrTooLong(tokens.get(i));
-          String thieToken = tokens.get(i);
           if (foundNum){continue;}
           if (i!=tokens.size()-1&&!containsNumberTooShortOrTooLong(tokens.get(i+1))){
             Pair<String,String> bigramPair = new Pair<>(tokens.get(i),tokens.get(i+1));

@@ -326,13 +326,13 @@ public class LanguageModel implements Serializable {
       return Math.log(Config.eps);
     }else{
 //
-      if (
-          ( term.length()==1 || balckListSet.contains(term) )
-              &&!whiteListSet.contains(term)
-          ){
-        double rescaled = Math.log(count);
-        return Math.log(rescaled)-Math.log(dict.termCount);
-      }
+//      if (
+//          ( term.length()==1 || balckListSet.contains(term) )
+//              &&!whiteListSet.contains(term)
+//          ){
+//        double rescaled = Math.log(count);
+//        return Math.log(rescaled)-Math.log(dict.termCount);
+//      }
       return Math.log(count)-Math.log(dict.termCount);
     }
   }

@@ -86,7 +86,7 @@ public class QueryPicker {
 //    int languageModelScaleingFactorSpace = 100;
 //    int smoothingFactor = 50;
     int languageModelScaleingFactorSpace = 1;
-    int smoothingFactor = 50;
+    int smoothingFactor = 1;
 //    int smoothingFactor = 80;
     for (int i=0;i<languageModelScaleingFactorSpace;++i){
 

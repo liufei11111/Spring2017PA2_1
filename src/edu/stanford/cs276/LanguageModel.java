@@ -229,11 +229,13 @@ public class LanguageModel implements Serializable {
       }
       if (!line.contains(" ")){
 
-        candsList.addAll(tearForNumber(line));
+//        candsList.addAll(tearForNumber(line));
+        candsList.add(line);
       }else{
         String[] cands = line.split(" ");
         for (String cand : cands){
-          candsList.addAll(tearForNumber(line));
+//          candsList.addAll(tearForNumber(line));
+          candsList.add(line);
         }
 
       }
@@ -241,16 +243,16 @@ public class LanguageModel implements Serializable {
     }
     return candsList;
   }
-  private List<String> tearForNumber(String str){
-    str.replaceAll(""," ");
-    str.replaceAll(" +"," ");
-    String[] terms = str.split(" ");
-    List<String> list = new LinkedList<>();
-    for (String term : terms){
-      list.add(term);
-    }
-    return list;
-  }
+//  private List<String> tearForNumber(String str){
+//    str.replaceAll("[0-9]+"," ");
+//    str.replaceAll(" +"," ");
+//    String[] terms = str.split(" ");
+//    List<String> list = new LinkedList<>();
+//    for (String term : terms){
+//      list.add(term);
+//    }
+//    return list;
+//  }
   private boolean containsNumberTooShortOrTooLong(String str) {
     int len = str.length();
     if (len>Config.wordThreshold||len==0){return true;}

@@ -489,11 +489,11 @@ public class CandidateGenerator implements Serializable {
     for (String querySpace1 : querySpace1s) {
       parseResult = invalidCount(querySpace1, dict);
       if (parseResult.get(0) == 0) {
-        candidates.get(0).add(querySpace1);
-        operateOnce(querySpace1, parseResult, dict, candidates.get(1));
+        candidates.get(1).add(querySpace1);
+        operateOnce(querySpace1, parseResult, dict, candidates.get(2));
       }
       if (parseResult.get(0) == 1) {
-        operateOnce(querySpace1, parseResult, dict, candidates.get(1));
+        operateOnce(querySpace1, parseResult, dict, candidates.get(2));
       }
     }
 
@@ -502,7 +502,7 @@ public class CandidateGenerator implements Serializable {
     for (String querySpace2 : querySpace2s) {
       parseResult = invalidCount(querySpace2, dict);
       if (parseResult.get(0) == 0) {
-        candidates.get(0).add(querySpace2);
+        candidates.get(2).add(querySpace2);
       }
     }
 

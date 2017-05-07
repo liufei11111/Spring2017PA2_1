@@ -77,17 +77,17 @@ public class QueryPicker {
     String goldQuery = null;
     String inputQuery = null;
 //    String candSetPerQuery = null;
-//    int languageModelScaleingFactorSpace = 100;
-//    int editProdSpace = 50;
-    int languageModelScaleingFactorSpace = 1;
-    int editProdSpace = 1;
-//    int editProdSpace = 80;
+    int languageModelScaleingFactorSpace = 50;
+//    int smoothFactorSpace = 50;
+//    int languageModelScaleingFactorSpace = 1;
+    int smoothFactorSpace = 1;
+//    int smoothFactorSpace = 80;
     for (int i=0;i<languageModelScaleingFactorSpace;++i){
 
-      for (int j=0;j<editProdSpace;++j) {
-        evaludateTestFile( languageModelScaleingFactorSpace,editProdSpace, goldFilePath,  i,  j,  languageModel, nsm);
+      for (int j=0;j<smoothFactorSpace;++j) {
+        evaludateTestFile( languageModelScaleingFactorSpace,smoothFactorSpace, goldFilePath,  i,  j,  languageModel, nsm);
 //
-        System.out.println(i+" out of "+languageModelScaleingFactorSpace+", "+j+" out of "+editProdSpace +" is done.");
+        System.out.println(i+" out of "+languageModelScaleingFactorSpace+", "+j+" out of "+smoothFactorSpace +" is done.");
       }
     }
   }
@@ -98,7 +98,7 @@ public class QueryPicker {
       goldFileReader = new BufferedReader(new FileReader(new File(goldFilePath)));
     }
 
-//    Config.languageModelScalingFactor = (j+1)*0.5 / jSize ;
+    Config.languageModelScalingFactor = (j+1)*1 / jSize ;
 //    Config.singleEditProb = (i+1)*0.1 /iSize;
     String indexI = ""+i;
     String indexJ = ""+j;

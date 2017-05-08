@@ -222,7 +222,7 @@ public class LanguageModel implements Serializable {
       return Math.log(count)-Math.log(dict.termCount);
     }
   }
-  public double getConditionalProd(String[] terms, int index) {
+  public double getConditionalProdNew(String[] terms, int index) {
     if (index<0||index>=terms.length){return Double.NaN;}
     double unigramScore = unigramProbForTerm(terms[index]);
     if (index == 0){
@@ -238,7 +238,21 @@ public class LanguageModel implements Serializable {
     // we use bigram to decide which word is wrong. and we just need to log of count and total is constant and can be ignored
     return  unigramScore*Config.smoothingFactor+bigramScore*(1-Config.smoothingFactor);
   }
-
+//  public double getConditionalProdOld(String[] terms, int index) {
+//    if (index<0||index>=terms.length){return Double.NaN;}
+//    double rawCountUnigram = rawCountForTerm(terms[index]);
+//    if (rawCountUnigram==0.0){return Math.log(Config.eps);}
+//    double unigramScore = rawCountUnigram/ dict.termCount;
+//    double countBigram = rawBiCountForTerms(terms[index],terms[index+1]);
+//    double bigramScore = countBigram/rawCountUnigram;
+//    if (index == 0){
+//      return Math.log(Config.smoothingFactor*unigramScore+ (1-Config.smoothingFactor)*bigramScore)
+//            +Math.log(unigramScore);
+//
+//    }else{
+//      return  Math.log(unigramScore*Config.smoothingFactor+bigramScore*(1-Config.smoothingFactor));
+//    }
+//  }
 
   private double rawBiCountForTerms(String term1, String term2) {
     Integer count = dict.bigram.get(new Pair<>(term1,term2));
@@ -262,7 +276,7 @@ public class LanguageModel implements Serializable {
     double logLanguageScore = 0.0; // log 1
     for(int i=0;i<terms.length-1;++i){
         // raw count is good as the total count is a constant
-        logLanguageScore += getConditionalProd(terms,i);
+        logLanguageScore += getConditionalProdNew(terms,i);
 
     }
     return logLanguageScore;

@@ -86,7 +86,7 @@ public class QueryPicker {
 //    int languageModelScaleingFactorSpace = 100;
 //    int smoothingFactor = 50;
     int languageModelScaleingFactorSpace = 1;
-    int smoothingFactor = 1;
+    int smoothingFactor = 100;
 //    int smoothingFactor = 80;
     for (int i=0;i<languageModelScaleingFactorSpace;++i){
 
@@ -105,7 +105,7 @@ public class QueryPicker {
     }
 
 //    Config.languageModelScalingFactor = 0.9+(i+1)*0.1 / iSize ;
-    Config.smoothingFactor = (j+1)*0.2 /jSize;
+    Config.smoothingFactor = (j+1)*0.6 /jSize;
     String indexI = ""+i;
     String indexJ = ""+j;
     int curr = indexI.length();

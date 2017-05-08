@@ -14,9 +14,9 @@ public class UniformCostModel implements EditCostModel {
 
     int distance = (int)(dis.charAt(0)-'0');
       if (distance >=1){
-        return  Math.log(Config.singleEditProb)*distance;
+        return -4.605170185988091*distance;// Math.log(Config.singleEditProb)*distance;
       }else{
-        return Math.log(1-Config.singleEditProb);
+        return -0.01005033585350145;//Math.log(1-Config.singleEditProb);
       }
   }
 }

@@ -334,23 +334,37 @@ public class LanguageModel implements Serializable {
       return Math.log(count)-Math.log(dict.termCount);
     }
   }
+//  public double getConditionalProd(String[] terms, int index) {
+//    if (index<0||index>=terms.length){return Double.NaN;}
+//    double unigramScore = unigramProbForTerm(terms[index]);
+//    if (index == 0){
+//      double termUnigram = rawCountForTerm(terms[index]);
+//      double countBigram = rawBiCountForTerms(terms[index],terms[index+1]);
+//      double bigramScore = Math.log(countBigram+Config.eps)-Math.log(termUnigram+Config.eps);
+//      return unigramScore+unigramScore*Config.smoothingFactor+bigramScore*(1-Config.smoothingFactor);
+//    }
+//
+//    double termUnigram = rawCountForTerm(terms[index]);
+//    double countBigram = rawBiCountForTerms(terms[index],terms[index+1]);
+//    double bigramScore = Math.log(countBigram+Config.eps)-Math.log(termUnigram+Config.eps);
+//    // we use bigram to decide which word is wrong. and we just need to log of count and total is constant and can be ignored
+//    return  unigramScore*Config.smoothingFactor+bigramScore*(1-Config.smoothingFactor);
+//  }
   public double getConditionalProd(String[] terms, int index) {
     if (index<0||index>=terms.length){return Double.NaN;}
-    double unigramScore = unigramProbForTerm(terms[index]);
-    if (index == 0){
-      double termUnigram = rawCountForTerm(terms[index]);
-      double countBigram = rawBiCountForTerms(terms[index],terms[index+1]);
-      double bigramScore = Math.log(countBigram+Config.eps)-Math.log(termUnigram+Config.eps);
-      return unigramScore+unigramScore*Config.smoothingFactor+bigramScore*(1-Config.smoothingFactor);
-    }
-
-    double termUnigram = rawCountForTerm(terms[index]);
+    double rawCountUnigram = rawCountForTerm(terms[index]);
+    if (rawCountUnigram==0.0){return Math.log(Config.eps);}
+    double unigramScore = rawCountUnigram/ dict.termCount;
     double countBigram = rawBiCountForTerms(terms[index],terms[index+1]);
-    double bigramScore = Math.log(countBigram+Config.eps)-Math.log(termUnigram+Config.eps);
-    // we use bigram to decide which word is wrong. and we just need to log of count and total is constant and can be ignored
-    return  unigramScore*Config.smoothingFactor+bigramScore*(1-Config.smoothingFactor);
-  }
+    double bigramScore = countBigram/rawCountUnigram;
+    if (index == 0){
+      return Math.log(Config.smoothingFactor*unigramScore+ (1-Config.smoothingFactor)*bigramScore)
+            +Math.log(unigramScore);
 
+    }else{
+      return  Math.log(unigramScore*Config.smoothingFactor+bigramScore*(1-Config.smoothingFactor));
+    }
+  }
 
   private double rawBiCountForTerms(String term1, String term2) {
     Integer count = dict.bigram.get(new Pair<>(term1,term2));

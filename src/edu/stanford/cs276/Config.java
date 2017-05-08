@@ -13,8 +13,8 @@ public class Config {
   public static final String occurenceFile = "occurence.txt";
   public static final String occurence2File = "occurence2.txt";
   // tuned
-  public static double languageModelScalingFactor = 0.93;// empirical value for language model scaling
-  public static double smoothingFactor=0.1;// tested not significant 146 ..
+  public static double languageModelScalingFactor = 0.37;// empirical value for language model scaling
+  public static double smoothingFactor=0.4;// tested not significant 146 ..
   // assumed/ no need to tune
   public static double eps = 1e-256;
   public static int wordThreshold=25;
